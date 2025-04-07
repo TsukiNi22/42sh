@@ -154,4 +154,5 @@ get_unknow_files:
         rm -f missing_files.txt; \
     fi
 
-.PHONY: all clean fclean re tests_run sys_cmd get_unregistered_files get_unknow_files
+.PHONY: all clean fclean re tests_run sys_cmd \
+	get_unregistered_files get_unknow_files
