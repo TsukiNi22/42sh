@@ -21,6 +21,15 @@ static int set_lens(main_data_t *data, int lens[])
     return OK;
 }
 
+static bool is_separator(main_data_t *data, char *input, int lens[], int i)
+{
+    if (!data || !input || !lens)
+        return err_prog(PTR_ERR, false, ERR_INFO);
+    return (my_strncmp(&input[i], data->conditional_string[0], lens[0]) == 0 ||
+    my_strncmp(&input[i], data->conditional_string[1], lens[1]) == 0 ||
+    my_strncmp(&input[i], data->redirection_string[0], lens[2]) == 0);
+}
+
 static int input_parser(main_data_t *data, char *input)
 {
     array_t *input_array = NULL;
@@ -35,9 +44,8 @@ static int input_parser(main_data_t *data, char *input)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     input_array = data->inputs->data[data->inputs->len - 1];
     for (i = 0; input[i]; i++) {
-        if (my_strncmp(&input[i], data->conditional_string[0], lens[0]) != 0 &&
-            my_strncmp(&input[i], data->conditional_string[1], lens[1]) != 0 &&
-            my_strncmp(&input[i], data->redirection_string[0], lens[2]) != 0)
+        if ((i > 0 && input[i - 1] == data->esc_char)
+            || !is_separator(data, input, lens, i))
             continue;
         if (parser(data, input_array, &input, &i) == KO)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
