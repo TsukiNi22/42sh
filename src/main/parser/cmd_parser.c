@@ -28,10 +28,12 @@ static int set_redirect_nb(array_t *array)
     return OK;
 }
 
-static int is_spe(char *input, int i, bool *spe)
+static bool is_spe(char *input, int i, bool *spe, char esc_char)
 {
     if (!input || !spe)
         return err_prog(PTR_ERR, false, ERR_INFO);
+    if (i > 0 && input[i - 1] == esc_char)
+        return false;
     if (input[i] == '\'' && !spe[1] && !spe[2])
         spe[0] = !spe[0];
     if (input[i] == '\"' && !spe[0] && !spe[2])
@@ -141,8 +143,8 @@ static int extract_redirection(main_data_t *data, array_t *array, char *input)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
     }
     for (int i = 0; input[i]; i++) {
-        if (!is_redirection_string(&input[i],
-            &(data->redirection_string[1]), lens))
+        if (data->esc_char == input[i - 1 * (i > 0)] || !is_redirection_string(
+            &input[i], &(data->redirection_string[1]), lens))
             continue;
         if (set_spe_char(&(data->redirection_string[1]),
             array, &input[i], lens) == KO)
@@ -178,7 +180,7 @@ int cmd_parser(main_data_t *data, array_t *array, char *input, int i)
     if (cmd_init(data, array, input) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     for (i = 0; input[i]; i++) {
-        if (is_spe(input, i, spe))
+        if (is_spe(input, i, spe, data->esc_char))
             continue;
         if ((input[i] == ' ' || input[i] == '\t')
             && set_cmd(array->data[array->len - 1], &ptr, &input[i]) == KO)
