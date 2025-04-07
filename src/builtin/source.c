@@ -34,12 +34,11 @@ static int exec_line(main_data_t *data, char *line)
     return OK;
 }
 
-static int exec_lines(main_data_t *data, char **lines,
-    char *input_save, array_t *inputs_save)
+static int exec_lines(main_data_t *data, char **lines)
 {
     int j = 0;
 
-    if (!data || !lines || !input_save || !inputs_save)
+    if (!data || !lines)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     for (int i = 0; lines[i]; i++) {
         if (lines[i][0] == '#')
@@ -54,8 +53,6 @@ static int exec_lines(main_data_t *data, char **lines,
         if (data->err_sys)
             return err_system(data, OK, "source", "Syntax error in ~/.myshrc");
     }
-    data->input = input_save;
-    data->inputs = inputs_save;
     return OK;
 }
 
@@ -101,6 +98,8 @@ static int set_file(main_data_t *data, array_t *input, char **file, char *path)
 
 int builtin_source(main_data_t *data, array_t *input, UNUSED int start)
 {
+    array_t *inputs_save = NULL;
+    char *input_save = NULL;
     char **lines = NULL;
     char *file = NULL;
     char *path = NULL;
@@ -112,9 +111,11 @@ int builtin_source(main_data_t *data, array_t *input, UNUSED int start)
         return OK;
     lines = str_to_str_array(file, "\n", false);
     free(file);
-    if (!lines)
+    input_save = data->input;
+    inputs_save = data->inputs;
+    if (!lines || exec_lines(data, lines) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
-    if (exec_lines(data, lines, data->input, data->inputs) == KO)
-        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    data->input = input_save;
+    data->inputs = inputs_save;
     return free_array(lines);
 }
