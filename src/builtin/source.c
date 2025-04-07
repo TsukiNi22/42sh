@@ -1,0 +1,123 @@
+/*
+** EPITECH PROJECT, 2025
+** source.c
+** File description:
+** Function for the source builtin
+*/
+
+#include "macro.h"
+#include "memory.h"
+#include "define.h"
+#include "my_string.h"
+#include "write.h"
+#include "file.h"
+#include "array.h"
+#include "my_string.h"
+#include "minishell.h"
+#include "error.h"
+#include <wait.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdbool.h>
+
+static int exec_line(main_data_t *data, char *line)
+{
+    if (!data || !line)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    data->input = line;
+    if (do_input(data) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    free(data->input);
+    if (delete_array(&(data->inputs), &free_input) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    return OK;
+}
+
+static int exec_lines(main_data_t *data, char **lines)
+{
+    int j = 0;
+
+    if (!data || !lines)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    for (int i = 0; lines[i]; i++) {
+        if (lines[i][0] == '#')
+            continue;
+        for (j = 0; lines[i][j] && lines[i][j] != '#'; j++);
+        lines[i][j] = '\0';
+        if (exec_line(data, my_strdup(lines[i])) == KO)
+            return err_prog(UNDEF_ERR, KO, ERR_INFO);
+        if (data->err_sys && my_printf("%Oline %d: %C%s\n%R",
+            STDERR, i, 255, 0, 0, lines[i]) == KO)
+            return err_prog(UNDEF_ERR, KO, ERR_INFO);
+        if (data->err_sys)
+            return err_system(data, OK, "source", "Syntax error in ~/.myshrc");
+    }
+    return OK;
+}
+
+static int create_file(char *path)
+{
+    int fd = 0;
+
+    if (!path)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    fd = open(path, O_CREAT | O_WRONLY, 0644);
+    if (fd == KO)
+        return err_prog(OP_FILE_ERR, KO, ERR_INFO);
+    my_putstr(fd, "# Welcome adventure to the myshrc if you're here i "
+    "should tell you this before anything else:\n"
+    "# You know, I don t think there are good or bad descriptions,\n"
+    "# for me, life is all about functions...\n"
+    "#\n# The myshrc execute lines like in the mysh at the initialisation\n");
+    close(fd);
+    return OK;
+}
+
+static int set_file(main_data_t *data, array_t *input, char **file, char *path)
+{
+    if (!data || !input || !file)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    if (!path) {
+        data->return_value = 1;
+        err_system(data, OK, "source", "Can't found the HOME "
+        "environement variable");
+        return KO;
+    }
+    *file = get_file(path);
+    if (!(*file)) {
+        if (input->len - (*((int *) input->data[0]) + 1)== 2)
+            create_file(path);
+        else
+            err_system(data, OK, "source", "Create a file ~/.myshrc or "
+            "use \'source -c\' if you want to use \'source\'");
+        return KO;
+    }
+    return OK;
+}
+
+int builtin_source(main_data_t *data, array_t *input, UNUSED int start)
+{
+    array_t *inputs_save = NULL;
+    char *input_save = NULL;
+    char **lines = NULL;
+    char *file = NULL;
+    char *path = NULL;
+
+    if (!data || !input)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    path = get_full_path(ht_search(data->env, "HOME"), MYSHRC_FILE);
+    if (set_file(data, input, &file, path) == KO)
+        return OK;
+    lines = str_to_str_array(file, "\n", false);
+    free(file);
+    if (!lines)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    input_save = data->input;
+    inputs_save = data->inputs;
+    if (exec_lines(data, lines) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    data->input = input_save;
+    data->inputs = inputs_save;
+    return free_array(lines);
+}

@@ -1,0 +1,194 @@
+/*
+** EPITECH PROJECT, 2025
+** parser.c
+** File description:
+** Parser the given input
+*/
+
+#include "define.h"
+#include "memory.h"
+#include "my_string.h"
+#include "minishell.h"
+#include "error.h"
+#include <stdlib.h>
+
+static int set_redirect_nb(array_t *array)
+{
+    int *val = NULL;
+
+    if (!array)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    val = malloc(sizeof(int));
+    if (!val)
+        return err_prog(MALLOC_ERR, KO, ERR_INFO);
+    *val = 0;
+    if (add_array(array, val) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    return OK;
+}
+
+static int set_quote(char *input, int i,
+    bool *single_quote, bool *double_quote)
+{
+    if (!input || !single_quote || !double_quote)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    if (input[i] == '\'' && !(*double_quote))
+        *single_quote = !(*single_quote);
+    if (input[i] == '\"' && !(*single_quote))
+        *double_quote = !(*double_quote);
+    return OK;
+}
+
+static int set_cmd(array_t *array, char **ptr, char *input)
+{
+    char *str = NULL;
+    int len = 0;
+
+    if (!array || !ptr || !input)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    len = input - *ptr;
+    if (len > 0) {
+        if (my_malloc_c(&str, len + 1) == KO)
+            return err_prog(UNDEF_ERR, KO, ERR_INFO);
+        for (int i = 0; i < len; i++)
+            str[i] = (*ptr)[i];
+        if (add_array(array, str) == KO)
+            return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    }
+    *ptr = input + 1;
+    return OK;
+}
+
+static bool is_redirection_string(char *input, char *redirection_string[], int *lens)
+{
+    if (!input || !redirection_string || !lens)
+        return err_prog(PTR_ERR, false, ERR_INFO);
+    for (int i = 0; i < 4; i++) {
+        if (my_strncmp(input, redirection_string[i], lens[i]) == 0)
+            return true;
+    }
+    return false;
+}
+
+static int clear_n_char(char *input, int n)
+{
+    int i = 0;
+
+    if (!input)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    for (i = n; input[i]; i++)
+        input[i - n] = input[i];
+    input[i - n] = '\0';
+    return OK;
+}
+
+static int set_spe_char(char *redirection_string[],
+    array_t *array, char *input, int *lens)
+{
+    int *val = NULL;
+    int i = 0;
+
+    if (!redirection_string || !array || !input || !lens)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    val = malloc(sizeof(int));
+    if (!val)
+        return err_prog(MALLOC_ERR, KO, ERR_INFO);
+    for (i = 0; i < 4; i++) {
+        if (my_strncmp(input, redirection_string[i], lens[i]) == 0)
+            break;
+    }
+    *val = D_RIGHT + i;
+#include <stdio.h>
+    printf("Val: %d\n", *val);
+    if (add_array(array, val) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    return clear_n_char(input, lens[i]);
+}
+
+static int set_redirection_arg(array_t *array, char *input)
+{
+    char *str = NULL;
+    char *ptr = NULL;
+    char c = '\0';
+    int i = 0;
+
+    if (!array || !input)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    for (i = 0; input[i] && (input[i] == ' ' || input[i] == '\t'); i++);
+    ptr = &input[i];
+    for (; input[i] && input[i] != ' ' && input[i] != '\t'; i++);
+    c = input[i];
+    input[i] = '\0';
+    str = my_strdup(ptr);
+    input[i] = c;
+    if (!str || add_array(array, str) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    return clear_n_char(input, i);
+}
+
+static int extract_redirection(main_data_t *data, array_t *array, char *input)
+{
+    int lens[4] = {0};
+
+    if (!data || !array || !input)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    for (int i = 1; i < 5; i++) {
+        lens[i - 1] = my_strlen(data->redirection_string[i]);
+        if (lens[i - 1] == KO)
+            return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    }
+    for (int i = 0; input[i]; i++) {
+        if (!is_redirection_string(&input[i],
+            &(data->redirection_string[1]), lens))
+            continue;
+        if (set_spe_char(&(data->redirection_string[1]),
+            array, &input[i], lens) == KO)
+            return err_prog(UNDEF_ERR, KO, ERR_INFO);
+        if (set_redirection_arg(array, &input[i]) == KO)
+            return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    }
+    return OK;
+}
+
+static int cmd_init(main_data_t *data, array_t *array, char *input)
+{
+    if (!data || !array || !input)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    if (add_array(array, new_array()) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    if (set_redirect_nb(array->data[array->len - 1]) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    if (extract_redirection(data, array->data[array->len - 1], input) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    *((int *) ((array_t *) array->data[array->len - 1])->data[0]) =
+    ((array_t *) array->data[array->len - 1])->len - 1;
+    return OK;
+}
+
+int cmd_parser(main_data_t *data, array_t *array, char *input)
+{
+    bool single_quote = false;
+    bool double_quote = false;
+    char *ptr = input;
+    int i = 0;
+
+    if (!data || !array || !input)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    if (cmd_init(data, array, input) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    for (i = 0; input[i]; i++) {
+        if (set_quote(input, i, &single_quote, &double_quote) == KO)
+            return err_prog(UNDEF_ERR, KO, ERR_INFO);
+        if (single_quote || double_quote)
+            continue;
+        if ((input[i] == ' ' || input[i] == '\t')
+            && set_cmd(array->data[array->len - 1], &ptr, &input[i]) == KO)
+            return err_prog(UNDEF_ERR, KO, ERR_INFO);
+        i += 2 * (input[i + 1] == data->esc_char) * !(!input[i + 1]);
+    }
+    if (single_quote)
+        return err_system(data, OK, NULL, "Unmatched '\''");
+    if (double_quote)
+        return err_system(data, OK, NULL, "Unmatched '\"'");
+    return set_cmd(array->data[array->len - 1], &ptr, &input[i]);
+}
