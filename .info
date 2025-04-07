@@ -1,0 +1,26 @@
+Branch:
+
+git branch -> voir la branch actuelle + les autre
+git branch branch_name -> cree une branch
+git switch branch_name -> changer de branch
+git merge branch_name -> merge la branch vert celle actuelle
+git push origin branch_name -> push sur la branch citer
+git pull origin branch_name -> pull sur la branch citer
+
+----------------------------------------------------------------------------------
+Branch Name:
+
+main / HEAD -> branch de rendu final (suelement ce qui marche)
+une branch par fonctionaliter majeur
+sinon metter dans la branch a votre nom ex: mathias, mathieux, ahmed, ...
+
+----------------------------------------------------------------------------------
+Commit norme:
+
+feat: ... -> ajout d'une nouvelle fonctionaliter / autre nouvelle ajout
+fix: ... -> fix d'un bug / fonctionaliter / autre probleme
+fix: cds | fix: coding-style -> retification du coding style
+
+ex avec feat (de meme pour fix):
+    feat (parser): ... -> ajout sur le parser et plus d'info dans ...
+    feat !: ... | feat (...)!: ... -> ajout d'une fonctionaliter majeur
