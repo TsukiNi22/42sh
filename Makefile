@@ -90,11 +90,11 @@ BUILTIN := 	builtin/exit.c \
 REDIRECT := main/redirection/get_heredoc.c
 
 FILES := $(INIT) $(SIGNAL) $(GLOBAL) $(MAIN) $(UPDATE)
-FILES += $(PARSER) $(REDIRECT) $(UPDATE) $(SYNTAX) $(BUILTIN) #$(REDIRECT)
+FILES += $(PARSER) $(REDIRECT) $(SYNTAX) $(BUILTIN) #$(REDIRECT)
 SRC := $(addprefix src/, $(FILES))
 OBJ := $(SRC:%.c=$(BUILD_DIR)/%.o)
 
-TEST_OBJ := $(filter-out main.o, $(OBJ))
+TEST_OBJ := $(filter-out $(BUILD_DIR)/src/main.o, $(OBJ))
 
 all: $(TARGET)
 
@@ -121,7 +121,7 @@ fclean: clean
 .NOTPARALLEL:
 re: fclean $(TARGET)
 
-unit_tests:
+unit_tests: $(TARGET)
 	$(CC) -o $(TEST_TARGET) $(TEST_OBJ) tests/*.c \
 	$(CPPFLAGS) $(LDFLAGS) --coverage -lcriterion
 
@@ -130,13 +130,8 @@ tests_run:    unit_tests
 	gcovr . --exclude tests/ --exclude lib/
 
 sys_cmd: $(TARGET)
-ifeq ($(BIN_DIR),)
-	@echo -e "Can't find \'/usr/local/bin\'."
-	@exit 1
-else
 	@echo "Copying the target in \'/usr/local/bin\'..."
 	@sudo cp $(TARGET) /usr/local/bin/$(TARGET)
-endif
 
 get_unregistered_files:
 	@find src/ -name "*.c" | while read file; do \
@@ -159,4 +154,4 @@ get_unknow_files:
         rm -f missing_files.txt; \
     fi
 
-.PHONY: all clean fclean re tests_run get_unregistered_files get_unknow_files
+.PHONY: all clean fclean re tests_run sys_cmd get_unregistered_files get_unknow_files
