@@ -108,6 +108,18 @@ static char *get_cmd_path(char **env_path, array_t *input, bool binary)
     return err_system_n(NULL, cmd, "Can't find a path to execute");
 }
 
+static void clear_memory_error_exec(main_data_t *data,
+    char **env, char **cmd, char *cmd_path)
+{
+    if (!data || !env || !cmd || !cmd_path)
+        exit(EPITECH_ERR);
+    free(cmd_path);
+    free_array(env);
+    free_array(cmd);
+    free_data(data);
+    exit(1 + 125 * (errno == ENOEXEC));
+}
+
 static void child(main_data_t *data, array_t *input)
 {
     char **env = NULL;
@@ -128,11 +140,7 @@ static void child(main_data_t *data, array_t *input)
     else
         err_system(data, KO, input->data[*((int *) input->data[0]) + 1],
         strerror(errno));
-    free_array(env);
-    free_array(cmd);
-    free(cmd_path);
-    free_data(data);
-    exit(1 + 125 * (errno == ENOEXEC));
+    clear_memory_error_exec(data, env, cmd, cmd_path);
 }
 
 static int handle_return(main_data_t *data, pid_t pid)
@@ -161,14 +169,10 @@ int exe_cmd(main_data_t *data, array_t *cmd)
 
     if (!data || !cmd)
         return err_prog(PTR_ERR, KO, ERR_INFO);
-    if (*((int *) cmd->data[0]) == -1)
-        my_printf("Val: %d\n", *((int *) cmd->data[1]));
     if (get_input_type(data, cmd) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     if (data->err_sys)
         return OK;
-    //if (set_redirection(cmd) == KO)
-    //    return err_prog(UNDEF_ERR, KO, ERR_INFO);
     if (!data->builtin) {
         pid = fork();
         if (pid == KO)

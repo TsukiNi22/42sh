@@ -9,6 +9,18 @@
 #include "minishell.h"
 #include "error.h"
 
+static int set_lens(main_data_t *data, int lens[])
+{
+    if (!data || !lens)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    lens[0] = my_strlen(data->conditional_string[0]);
+    lens[1] = my_strlen(data->conditional_string[1]);
+    lens[2] = my_strlen(data->redirection_string[0]);
+    if (lens[0] == KO || lens[1] == KO || lens[2] == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    return OK;
+}
+
 static int input_parser(main_data_t *data, char *input)
 {
     array_t *input_array = NULL;
@@ -17,12 +29,9 @@ static int input_parser(main_data_t *data, char *input)
 
     if (!data)
         return err_prog(PTR_ERR, KO, ERR_INFO);
-    if (add_array(data->inputs, new_array()) == KO)
+    if (set_lens(data, lens) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
-    lens[0] = my_strlen(data->conditional_string[0]);
-    lens[1] = my_strlen(data->conditional_string[1]);
-    lens[2] = my_strlen(data->redirection_string[0]);
-    if (lens[0] == KO || lens[1] == KO || lens[2] == KO)
+    if (add_array(data->inputs, new_array()) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     input_array = data->inputs->data[data->inputs->len - 1];
     for (i = 0; input[i]; i++) {

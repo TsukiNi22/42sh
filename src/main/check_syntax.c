@@ -51,7 +51,7 @@ static int set_pipe(bool pipe[], array_t *inputs, int i)
     pipe[0] = (i > 0
     && *((int *) ((array_t *) inputs->data[i - 1])->data[0]) == -1
     && *((int *) ((array_t *) inputs->data[i - 1])->data[1]) == PIPE);
-    pipe[1] = (i + 1 < inputs->len
+    pipe[1] = ((size_t) i + 1 < inputs->len
     && *((int *) ((array_t *) inputs->data[i + 1])->data[0]) == -1
     && *((int *) ((array_t *) inputs->data[i + 1])->data[1]) == PIPE);
     return OK;
@@ -76,7 +76,7 @@ static int check_syntax_redirection(main_data_t *data, array_t *input,
         if (pipe[1] && (red_val == D_RIGHT || red_val == RIGHT))
             return err_system(data, OK, NULL, "Ambiguous output redirect");
     }
-    if (*((int *) input->data[0]) + 1 == input->len)
+    if (*((int *) input->data[0]) + 1 == (int) input->len)
         return err_system(data, OK, NULL, "Invalid null command");
     return OK;
 }

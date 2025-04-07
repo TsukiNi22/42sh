@@ -55,18 +55,15 @@ int builtin_alias(main_data_t *data, array_t *input, int start)
     data->return_value = 1;
     if (input->len - start == 1)
         return display_alias(data);
-    if (input->len - start == 2) {
-        if (display_one_alias(data, input, start) == KO)
-            return err_prog(UNDEF_ERR, KO, ERR_INFO);
-    } else if (input->len - start != 1) {
-        if (ht_insert(data->alias, my_strdup(input->data[start + 1]),
-            my_strdup(input->data[start + 2]), &free_hash_data_str) == KO)
-            return err_prog(UNDEF_ERR, KO, ERR_INFO);
-        if (!data->silent &&
-            my_printf("%s: Suceffuly added to alias for '%s'.\n",
-            input->data[start + 1], input->data[start + 2]) == KO)
-            return err_prog(UNDEF_ERR, KO, ERR_INFO);
-        data->return_value = OK;
-    }
+    if (input->len - start == 2)
+        return display_one_alias(data, input, start);
+    if (ht_insert(data->alias, my_strdup(input->data[start + 1]),
+        my_strdup(input->data[start + 2]), &free_hash_data_str) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    if (!data->silent &&
+        my_printf("%s: Suceffuly added to alias for '%s'.\n",
+        input->data[start + 1], input->data[start + 2]) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    data->return_value = OK;
     return OK;
 }

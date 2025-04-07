@@ -5,6 +5,7 @@
 ** Parser the given input
 */
 
+#include "write.h"
 #include "define.h"
 #include "memory.h"
 #include "my_string.h"
@@ -27,16 +28,19 @@ static int set_redirect_nb(array_t *array)
     return OK;
 }
 
-static int set_quote(char *input, int i,
-    bool *single_quote, bool *double_quote)
+static int is_spe(char *input, int i, bool *spe)
 {
-    if (!input || !single_quote || !double_quote)
-        return err_prog(PTR_ERR, KO, ERR_INFO);
-    if (input[i] == '\'' && !(*double_quote))
-        *single_quote = !(*single_quote);
-    if (input[i] == '\"' && !(*single_quote))
-        *double_quote = !(*double_quote);
-    return OK;
+    if (!input || !spe)
+        return err_prog(PTR_ERR, false, ERR_INFO);
+    if (input[i] == '\'' && !spe[1] && !spe[2])
+        spe[0] = !spe[0];
+    if (input[i] == '\"' && !spe[0] && !spe[2])
+        spe[1] = !spe[1];
+    if (input[i] == '(' && !spe[0] && !spe[1] && !spe[2])
+        spe[2] = true;
+    if (input[i] == ')' && !spe[0] && !spe[1] && spe[2])
+        spe[2] = false;
+    return (spe[0] || spe[1] || spe[2]);
 }
 
 static int set_cmd(array_t *array, char **ptr, char *input)
@@ -59,7 +63,8 @@ static int set_cmd(array_t *array, char **ptr, char *input)
     return OK;
 }
 
-static bool is_redirection_string(char *input, char *redirection_string[], int *lens)
+static bool is_redirection_string(char *input,
+    char *redirection_string[], int *lens)
 {
     if (!input || !redirection_string || !lens)
         return err_prog(PTR_ERR, false, ERR_INFO);
@@ -98,8 +103,6 @@ static int set_spe_char(char *redirection_string[],
             break;
     }
     *val = D_RIGHT + i;
-#include <stdio.h>
-    printf("Val: %d\n", *val);
     if (add_array(array, val) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     return clear_n_char(input, lens[i]);
@@ -165,30 +168,26 @@ static int cmd_init(main_data_t *data, array_t *array, char *input)
     return OK;
 }
 
-int cmd_parser(main_data_t *data, array_t *array, char *input)
+int cmd_parser(main_data_t *data, array_t *array, char *input, int i)
 {
-    bool single_quote = false;
-    bool double_quote = false;
+    bool spe[3] = {false};
     char *ptr = input;
-    int i = 0;
 
     if (!data || !array || !input)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     if (cmd_init(data, array, input) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     for (i = 0; input[i]; i++) {
-        if (set_quote(input, i, &single_quote, &double_quote) == KO)
-            return err_prog(UNDEF_ERR, KO, ERR_INFO);
-        if (single_quote || double_quote)
+        if (is_spe(input, i, spe))
             continue;
         if ((input[i] == ' ' || input[i] == '\t')
             && set_cmd(array->data[array->len - 1], &ptr, &input[i]) == KO)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
         i += 2 * (input[i + 1] == data->esc_char) * !(!input[i + 1]);
     }
-    if (single_quote)
-        return err_system(data, OK, NULL, "Unmatched '\''");
-    if (double_quote)
-        return err_system(data, OK, NULL, "Unmatched '\"'");
+    data->err_sys = (spe[0] || spe[1] || spe[2]);
+    if (spe[0] || spe[1] || spe[2])
+        return my_printf("Unmatched '%c'.\n",
+        '\'' * spe[0] + '\"' * spe[1] + '(' * spe[2]);
     return set_cmd(array->data[array->len - 1], &ptr, &input[i]);
 }

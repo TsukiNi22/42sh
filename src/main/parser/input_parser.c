@@ -21,7 +21,7 @@ static int set_input(char *conditional_string[], char *redirection_string[],
     lens[1] = my_strlen(conditional_string[1]);
     lens[2] = my_strlen(redirection_string[0]);
     if (lens[0] == KO || lens[1] == KO || lens[2] == KO)
-        return err_prog(UNDEF_ERR, KO, ERR_INFO);   
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
     if (my_strncmp(&(*input)[*i], conditional_string[0], lens[0]) == 0)
         *input = &(*input)[*i + lens[0]];
     else if (my_strncmp(&(*input)[*i], conditional_string[1], lens[1]) == 0)
@@ -74,7 +74,6 @@ static int set_spe_string(char *conditional_string[],
     array->data[array->len - 1], input, vals[1]);
 }
 
-
 static bool is_empty(char *input)
 {
     if (!input)
@@ -94,7 +93,7 @@ int parser(main_data_t *data, array_t *array, char **input, int *i)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     c = (*input)[*i];
     (*input)[*i] = '\0';
-    if (!is_empty(*input) && cmd_parser(data, array, *input) == KO)
+    if (!is_empty(*input) && cmd_parser(data, array, *input, 0) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     (*input)[*i] = c;
     if (c && set_spe_string(data->conditional_string,
