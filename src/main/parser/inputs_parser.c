@@ -45,6 +45,20 @@ static int input_parser(main_data_t *data, char *input)
     return parser(data, input_array, &input, &i);
 }
 
+static int init_var(main_data_t *data, char **last_ptr, int *len)
+{
+    if (!data || !last_ptr || !len)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    *last_ptr = data->input;
+    *len = my_strlen(data->cmd_separator);
+    if (*len == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    data->inputs = new_array();
+    if (!data->inputs)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    return OK;
+}
+
 int inputs_parser(main_data_t *data)
 {
     char *last_ptr = NULL;
@@ -53,13 +67,12 @@ int inputs_parser(main_data_t *data)
 
     if (!data)
         return err_prog(PTR_ERR, KO, ERR_INFO);
-    len = my_strlen(data->cmd_separator);
-    last_ptr = data->input;
-    data->inputs = new_array();
-    if (!data->inputs || len == KO)
+    if (init_var(data, &last_ptr, &len) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     do {
         ptr = my_strstr(last_ptr, data->cmd_separator);
+        while (ptr && ptr > data->input && *(ptr - 1) == data->esc_char)
+            ptr = my_strstr(ptr + len, data->cmd_separator);
         if (ptr)
             ptr[0] = '\0';
         if (input_parser(data, last_ptr) == KO)
