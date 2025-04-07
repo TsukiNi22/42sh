@@ -40,7 +40,8 @@ static int check_path(main_data_t *data)
     data->path_changed = false;
     for (int i = 0; data->env_path[i]; i++) {
         if (!is_accesible_dir(data->env_path[i]))
-            res = my_printf("%OThe path '%s' in the environement variable 'PATH'"
+            res = my_printf("%OThe path '%s'"
+            " in the environement variable 'PATH'"
             ", does not exist or insufficient permission to read. "
             "Can't obtain system function.\n", STDERR, data->env_path[i]);
         if (res != OK)

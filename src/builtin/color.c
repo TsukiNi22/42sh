@@ -24,7 +24,7 @@ int builtin_color(main_data_t *data, array_t *input, int start)
         data->g = my_atoi(input->data[start + 2]);
     if (input->len - start == 4)
         data->b = my_atoi(input->data[start + 3]);
-    if (!data->silent && 
+    if (!data->silent &&
         my_printf("Color set to: %d, %d, %d\n%CThis is a color test :)\n%R",
         data->r, data->g, data->b, data->r, data->g, data->b) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);

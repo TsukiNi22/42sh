@@ -92,7 +92,8 @@ static int check_syntax_input(main_data_t *data, array_t *input)
         if (n == -1 && (i + 1 >= input->len
             || *((int *) ((array_t *) input->data[i + 1])->data[0]) == -1))
             return err_system(data, OK, NULL, "Invalid null command");
-        if (n > 0 && check_syntax_redirection(data, input->data[i], input, i) == KO)
+        if (n > 0
+            && check_syntax_redirection(data, input->data[i], input, i) == KO)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
     }
     return OK;

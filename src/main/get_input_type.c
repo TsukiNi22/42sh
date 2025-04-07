@@ -53,7 +53,7 @@ static int is_system_bin(main_data_t *data, array_t *input)
 }
 
 static int check_syntax_dispatch(main_data_t *data, array_t *input,
-        builtin_func_t cmd)
+    builtin_func_t cmd)
 {
     int start = 0;
 
@@ -85,9 +85,7 @@ int get_input_type(main_data_t *data, array_t *input)
     if (!data->builtin) {
         if (!is_system_bin(data, input))
             return err_system(data, OK, input->data[st], "Command not found");
-        return OK;
-    }
-    if (check_syntax_dispatch(data, input, data->builtin_val) == KO)
+    } else if (check_syntax_dispatch(data, input, data->builtin_val) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     data->return_value = 1 * data->err_sys;
     return OK;

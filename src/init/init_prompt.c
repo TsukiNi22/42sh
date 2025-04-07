@@ -13,7 +13,7 @@ int init_prompt(main_data_t *data)
 {
     if (!data)
         return err_prog(PTR_ERR, KO, ERR_INFO);
-    data->esc_char ='\\';
+    data->esc_char = '\\';
     data->cmd_separator = my_strdup(";");
     if (!data->cmd_separator)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);

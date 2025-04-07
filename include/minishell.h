@@ -228,9 +228,9 @@ extern char const *parser_separator[];
 
 /* builtin_function */
 extern char const *builtin_array_name[];
-extern int (* const builtin_check_syntax[])
-    (main_data_t *, array_t *input, int);
-extern int (* const builtin_func[])
-    (main_data_t *, array_t *input, int);
+extern int (* const builtin_check_syntax[])(main_data_t *,
+    array_t *input, int);
+extern int (* const builtin_func[])(main_data_t *,
+    array_t *input, int);
 
 #endif /* MINISHELL_H */

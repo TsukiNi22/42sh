@@ -177,7 +177,8 @@ int exe_cmd(main_data_t *data, array_t *cmd)
             child(data, cmd);
         if (handle_return(data, pid) == KO)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
-    } else if (builtin_func[data->builtin_val](data, cmd, *((int *) cmd->data[0]) + 1) == KO)
+    } else if (builtin_func[data->builtin_val](data,
+        cmd, *((int *) cmd->data[0]) + 1) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     return OK;
 }
