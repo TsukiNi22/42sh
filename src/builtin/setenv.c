@@ -22,11 +22,12 @@ int builtin_setenv(main_data_t *data, array_t *input, int start)
     }
     if (my_strcmp(input->data[start + 1], "PATH") == 0)
         data->path_changed = true;
-    if (input->data[start + 2]) {
+    if (input->len - start == 2) {
         if (ht_insert(data->env, my_strdup(input->data[start + 1]),
             my_strdup(input->data[start + 2]), &free_hash_data_str) == KO)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
-    } else {
+    }
+    if (input->len - start != 1 && input->len - start != 2) {
         if (ht_insert(data->env, my_strdup(input->data[start + 1]),
             my_strdup(""), &free_hash_data_str) == KO)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
