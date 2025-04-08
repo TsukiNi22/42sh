@@ -189,10 +189,19 @@ int exe_cmd(main_data_t *data, array_t *cmd)
 
 int exe_input(main_data_t *data, array_t *input)
 {
+    int type = 0;
+    int nb = 0;
+
     if (!data || !input)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     for (size_t i = 0; i < input->len; i++) {
-        if (*((int *) ((array_t *) input->data[i])->data[0]) < 0)
+        nb = *((int *) ((array_t *) input->data[i])->data[0]);
+        if (nb < 0)
+         type = *((int *) ((array_t *) input->data[i])->data[1]);
+        if (nb < 0 && ((type == AND && data->return_value != OK)
+            || (type == OR && data->return_value == OK)))
+            break;
+        if (nb < 0)
             continue;
         if (exe_cmd(data, input->data[i]) == KO)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
