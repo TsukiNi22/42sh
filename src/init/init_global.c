@@ -23,6 +23,9 @@ int init_global(main_data_t *data)
     data->err_sys = false;
     data->input = NULL;
     data->inputs = NULL;
+    data->pipefd[0] = KO;
+    data->pipefd[1] = KO;
+    data->prevfd = KO;
     data->stdin_save = dup(STDIN_FILENO);
     data->stdout_save = dup(STDOUT_FILENO);
     if (data->stdin_save == KO || data->stdout_save == KO)

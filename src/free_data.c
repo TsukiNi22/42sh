@@ -54,6 +54,22 @@ static void close_port(int stdin_save, int stdout_save)
     close(stdout_save);
 }
 
+static int clear_redirection_local(main_data_t *data)
+{
+    if (!data)
+        return err_prog(PTR_ERR, EPITECH_ERR, ERR_INFO);
+    for (int j = 0; j < 2; j++) {
+        if (data->pipefd[j] != KO)
+            close(data->pipefd[j]);
+        data->pipefd[j] = KO;
+    }
+    if (dup2(data->stdin_save, STDIN_FILENO) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    if (dup2(data->stdout_save, STDOUT_FILENO) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    return OK;
+}
+
 static int free_prompt_string(main_data_t *data)
 {
     if (!data)
@@ -87,5 +103,5 @@ int free_data(main_data_t *data)
     }
     close_port(data->stdin_save, data->stdout_save);
     free_prompt_string(data);
-    return EPITECH_ERR * (clear_redirection(data) == KO);
+    return clear_redirection_local(data);
 }

@@ -126,7 +126,7 @@ static void child(main_data_t *data, array_t *input)
     char **cmd = NULL;
     char *cmd_path = NULL;
 
-    if (!data || !input)
+    if (!data || !input || set_pipe_child(data) == KO)
         exit(EPITECH_ERR);
     env = materialise_env(data);
     cmd = materialise_cmd(input);
@@ -143,13 +143,15 @@ static void child(main_data_t *data, array_t *input)
     clear_memory_error_exec(data, env, cmd, cmd_path);
 }
 
-static int handle_return(main_data_t *data, pid_t pid)
+static int handle_return(main_data_t *data, pid_t pid, array_t *input, int i)
 {
     int status = OK;
     int signal = 0;
 
-    if (!data)
+    if (!data || !input)
         return err_prog(PTR_ERR, KO, ERR_INFO);
+    if (set_pipe_parent(data, input, i) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
     waitpid(pid, &status, WUNTRACED);
     if (WIFSIGNALED(status)) {
         signal = WTERMSIG(status);
@@ -163,11 +165,11 @@ static int handle_return(main_data_t *data, pid_t pid)
     return OK;
 }
 
-int exe_cmd(main_data_t *data, array_t *cmd)
+int exe_cmd(main_data_t *data, array_t *cmd, array_t *input, int i)
 {
     pid_t pid = OK;
 
-    if (!data || !cmd)
+    if (!data || !cmd || !input)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     if (get_input_type(data, cmd) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
@@ -179,12 +181,12 @@ int exe_cmd(main_data_t *data, array_t *cmd)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
         if (pid == OK)
             child(data, cmd);
-        if (handle_return(data, pid) == KO)
+        if (handle_return(data, pid, input, i) == KO)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
     } else if (builtin_func[data->builtin_val](data,
         cmd, *((int *) cmd->data[0]) + 1) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
-    return clear_redirection(data);
+    return clear_redirection(data, input, i);
 }
 
 int exe_input(main_data_t *data, array_t *input)
@@ -203,9 +205,9 @@ int exe_input(main_data_t *data, array_t *input)
             break;
         if (nb < 0)
             continue;
-        if (set_redirection(data, input->data[i]) == KO)
+        if (set_redirection(data, input->data[i], input, i) == KO)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
-        if (exe_cmd(data, input->data[i]) == KO)
+        if (exe_cmd(data, input->data[i], input, i) == KO)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
     }
     return OK;

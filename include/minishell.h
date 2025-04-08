@@ -85,6 +85,8 @@ typedef enum builtin_func_e {
 /* data */
 typedef struct main_data_s {
     /* redirect_var */
+    int pipefd[2];
+    int prevfd;
     int stdin_save;
     int stdout_save;
 
@@ -151,12 +153,14 @@ int cmd_parser(main_data_t *data, array_t *array, char *input, int i);
 int check_syntax(main_data_t *data); // Error: KO
 int get_input_type(main_data_t *data, array_t *input); // Error: KO
 
-/* redirection */
-int set_redirection(main_data_t *data, array_t *input); // Error: KO
-int clear_redirection(main_data_t *data); // Error: KO
+/* redirection */ // Error: KO
+int set_redirection(main_data_t *data, array_t *input, array_t *inputs, int i);
+int set_pipe_child(main_data_t *data); // Error: KO
+int set_pipe_parent(main_data_t *data, array_t *input, int i); // Error: KO
+int clear_redirection(main_data_t *data, array_t *input, int i); // Error: KO
 
-/* exec */
-int exe_cmd(main_data_t *data, array_t *cmd); // Error: KO
+/* exec */ // Error: KO
+int exe_cmd(main_data_t *data, array_t *cmd, array_t *input, int i);
 int exe_input(main_data_t *data, array_t *input); // Error: KO
 int exe_inputs(main_data_t *data); // Error: KO
 

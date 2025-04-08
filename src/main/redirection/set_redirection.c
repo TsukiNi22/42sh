@@ -17,10 +17,19 @@
 #include <unistd.h>
 #include <stdbool.h>
 
-int clear_redirection(main_data_t *data)
+int clear_redirection(main_data_t *data, array_t *input, int i)
 {
-    if (!data)
+    if (!data || !input)
         return err_prog(PTR_ERR, KO, ERR_INFO);
+    if ((size_t) i + 1 <= input->len - 1
+        || ((size_t) i + 1 <= input->len - 1
+        && *((int *) ((array_t *) input->data[i + 1])->data[1]) == PIPE))
+        return OK;
+    for (int j = 0; j < 2; j++) {
+        if (data->pipefd[j] != KO)
+            close(data->pipefd[j]);
+        data->pipefd[j] = KO;
+    }
     if (dup2(data->stdin_save, STDIN_FILENO) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     if (dup2(data->stdout_save, STDOUT_FILENO) == KO)
@@ -96,21 +105,75 @@ static int redirect_d_right(main_data_t *data, char *file)
     return OK;
 }
 
-int set_redirection(main_data_t *data, array_t *input)
+static int set_pipefd(main_data_t *data, array_t *input, int i)
 {
-    redirection_t red = PIPE;
+    int type = OK;
 
     if (!data || !input)
         return err_prog(PTR_ERR, KO, ERR_INFO);
-    for (int i = 1; !data->err_sys && i < *((int *) input->data[0]); i += 2) {
-        red = *((int *) input->data[i]);
-        if (red == RIGHT && redirect_right(data, input->data[i + 1]) == KO)
+    if ((size_t) i + 1 > input->len - 1)
+        return OK;
+    type = *((int *) ((array_t *) input->data[i + 1])->data[1]);
+    if (type == PIPE && pipe(data->pipefd) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    return OK;
+}
+
+int set_pipe_child(main_data_t *data)
+{
+    if (!data)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    if (data->prevfd != KO) {
+        dup2(data->prevfd, STDIN_FILENO);
+        close(data->prevfd);
+        data->prevfd = KO;
+    }
+    if (data->pipefd[0] != KO && data->pipefd[1] != KO) {
+        close(data->pipefd[0]);
+        dup2(data->pipefd[1], STDOUT_FILENO);
+        close(data->pipefd[1]);
+    }
+    return OK;
+}
+
+int set_pipe_parent(main_data_t *data, array_t *input, int i)
+{
+    int type = OK;
+
+    if (!data || !input)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    if (data->prevfd != KO) {
+        close(data->prevfd);
+        data->prevfd = KO;
+    }
+    if ((size_t) i + 1 > input->len - 1)
+        return OK;
+    type = *((int *) ((array_t *) input->data[i + 1])->data[1]);
+    if (type == PIPE && data->pipefd[0] != KO && data->pipefd[1] != KO) {
+        close(data->pipefd[1]);
+        data->pipefd[1] = KO;
+        data->prevfd = data->pipefd[0];
+    }
+    return OK;
+}
+
+int set_redirection(main_data_t *data, array_t *input, array_t *inputs, int i)
+{
+    redirection_t red = PIPE;
+
+    if (!data || !input || !inputs)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    if (set_pipefd(data, inputs, i) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    for (int j = 1; !data->err_sys && j < *((int *) input->data[0]); j += 2) {
+        red = *((int *) input->data[j]);
+        if (red == RIGHT && redirect_right(data, input->data[j + 1]) == KO)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
-        if (red == D_RIGHT && redirect_d_right(data, input->data[i + 1]) == KO)
+        if (red == D_RIGHT && redirect_d_right(data, input->data[j + 1]) == KO)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
-        if (red == LEFT && redirect_left(data, input->data[i + 1]) == KO)
+        if (red == LEFT && redirect_left(data, input->data[j + 1]) == KO)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
-        if (red == D_LEFT && redirect_d_left(data, input->data[i + 1]) == KO)
+        if (red == D_LEFT && redirect_d_left(data, input->data[j + 1]) == KO)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
     }
     data->return_value = 1 * data->err_sys;
