@@ -197,7 +197,7 @@ int exe_input(main_data_t *data, array_t *input)
     for (size_t i = 0; i < input->len; i++) {
         nb = *((int *) ((array_t *) input->data[i])->data[0]);
         if (nb < 0)
-         type = *((int *) ((array_t *) input->data[i])->data[1]);
+            type = *((int *) ((array_t *) input->data[i])->data[1]);
         if (nb < 0 && ((type == AND && data->return_value != OK)
             || (type == OR && data->return_value == OK)))
             break;
