@@ -59,6 +59,9 @@ PARSER := 	main/parser/inputs_parser.c \
 			main/parser/input_parser.c \
 			main/parser/cmd_parser.c
 
+REDIRECT := main/redirection/set_redirection.c \
+			main/redirection/get_heredoc.c
+
 SYNTAX := 	check_syntax/check_syntax_exit.c \
 			check_syntax/check_syntax_cd.c \
 			check_syntax/check_syntax_setenv.c \
@@ -87,11 +90,8 @@ BUILTIN := 	builtin/exit.c \
 			builtin/rehash.c \
 			builtin/silent.c
 
-REDIRECT := main/redirection/set_redirection.c \
-			main/redirection/get_heredoc.c
-
 FILES := $(INIT) $(SIGNAL) $(GLOBAL) $(MAIN) $(UPDATE)
-FILES += $(PARSER) $(REDIRECT) $(SYNTAX) $(BUILTIN) $(REDIRECT)
+FILES += $(PARSER) $(REDIRECT) $(SYNTAX) $(BUILTIN)
 SRC := $(addprefix src/, $(FILES))
 OBJ := $(SRC:%.c=$(BUILD_DIR)/%.o)
 
