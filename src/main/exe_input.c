@@ -184,7 +184,7 @@ int exe_cmd(main_data_t *data, array_t *cmd)
     } else if (builtin_func[data->builtin_val](data,
         cmd, *((int *) cmd->data[0]) + 1) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
-    return OK;
+    return clear_redirection(data);
 }
 
 int exe_input(main_data_t *data, array_t *input)
@@ -203,6 +203,8 @@ int exe_input(main_data_t *data, array_t *input)
             break;
         if (nb < 0)
             continue;
+        if (set_redirection(data, input->data[i]) == KO)
+            return err_prog(UNDEF_ERR, KO, ERR_INFO);
         if (exe_cmd(data, input->data[i]) == KO)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
     }

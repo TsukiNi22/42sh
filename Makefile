@@ -87,10 +87,11 @@ BUILTIN := 	builtin/exit.c \
 			builtin/rehash.c \
 			builtin/silent.c
 
-REDIRECT := main/redirection/get_heredoc.c
+REDIRECT := main/redirection/set_redirection.c \
+			main/redirection/get_heredoc.c
 
 FILES := $(INIT) $(SIGNAL) $(GLOBAL) $(MAIN) $(UPDATE)
-FILES += $(PARSER) $(REDIRECT) $(SYNTAX) $(BUILTIN) #$(REDIRECT)
+FILES += $(PARSER) $(REDIRECT) $(SYNTAX) $(BUILTIN) $(REDIRECT)
 SRC := $(addprefix src/, $(FILES))
 OBJ := $(SRC:%.c=$(BUILD_DIR)/%.o)
 

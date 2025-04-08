@@ -87,5 +87,5 @@ int free_data(main_data_t *data)
     }
     close_port(data->stdin_save, data->stdout_save);
     free_prompt_string(data);
-    return OK;
+    return EPITECH_ERR * (clear_redirection(data) == KO);
 }
