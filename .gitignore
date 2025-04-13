@@ -22,3 +22,4 @@ unit_tests
 q
 vg
 compile_commands.json
+.cache
