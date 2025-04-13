@@ -9,6 +9,7 @@
 #include "error.h"
 #include <signal.h>
 #include <stdbool.h>
+#include <unistd.h>
 
 static void set_signal(void)
 {
@@ -33,6 +34,9 @@ int do_input(main_data_t *data)
 
 int minishell(main_data_t *data)
 {
+    struct termios original;
+
+    enable_raw_mode(&original);
     if (!data)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     if (init_data(data) == KO)
@@ -48,5 +52,6 @@ int minishell(main_data_t *data)
         if (!data->out && do_input(data) == KO)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
     }
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &original);
     return OK;
 }

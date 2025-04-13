@@ -25,14 +25,14 @@ int get_input(main_data_t *data)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     if (!data->input_redirect && set_prompt(data) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
-    res = getline(&(data->input), &(size_t){0}, stdin);
+    res = input_handler(&(data->input));
+    printf("\n");
     if (res == KO) {
         data->out = true;
         if (!data->input_redirect)
             my_putstr(STDOUT, "exit\n");
         return OK;
     }
-    data->input[res - 1] = '\0';
     if (reset_ouput(1) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     return add_history(data, data->env, data->input);

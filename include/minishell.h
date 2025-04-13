@@ -16,6 +16,7 @@
     #include "array.h" // array_t
     #include <stdbool.h> // boolean
     #include <time.h> // time_t
+    #include <termios.h> // termios
 
     //----------------------------------------------------------------//
     /* DEFINE */
@@ -33,6 +34,9 @@
     /* builtin */
     #define BUILTIN_MIN EXIT
     #define BUILTIN_MAX SILENT
+
+    /* input handling */
+    #define MAX_INPUT_STR 2048
 
     //----------------------------------------------------------------//
     /* MACRO */
@@ -224,6 +228,10 @@ int builtin_silent(main_data_t *data, array_t *input, int start);
 int free_data(main_data_t *data); // Error: EPITECH_ERR
 int free_array(char **array); // Error: KO
 int free_input(void *input); // Error: KO
+
+/* autocompletion */
+void enable_raw_mode(struct termios *original);
+int input_handler(char **input);
 
 //----------------------------------------------------------------//
 /* GLOBAL_CONST */
