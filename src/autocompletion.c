@@ -13,6 +13,14 @@
 #include <unistd.h>
 #include <stdlib.h>
 
+static size_t get_array_len(const char **arr)
+{
+    size_t len = 0;
+
+    for (; arr[len]; len++);
+    return len;
+}
+
 static void get_from_path(char ***cmds, char *path, size_t *i)
 {
     DIR *d = opendir(path);
@@ -37,13 +45,15 @@ static void get_from_path(char ***cmds, char *path, size_t *i)
 
 static char **get_cmds(hashtable_t *env)
 {
-    char **cmds = malloc(sizeof(char *));
+    size_t i = get_array_len(builtin_array_name);
+    char **cmds = malloc(sizeof(char *) * i);
     char *path = strdup(ht_search(env, "PATH"));
     char *ptr = strtok(path, ":");
-    size_t i = 0;
 
     if (!path || !cmds)
         return NULL;
+    for (size_t j = 0; j < i; j++)
+        cmds[j] = strdup(builtin_array_name[j]);
     while (ptr) {
         get_from_path(&cmds, ptr, &i);
         ptr = strtok(NULL, ":");
