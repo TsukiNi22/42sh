@@ -231,7 +231,7 @@ int free_input(void *input); // Error: KO
 
 /* autocompletion */
 void enable_raw_mode(struct termios *original);
-int input_handler(char **input);
+int input_handler(char **input, hashtable_t *env);
 
 //----------------------------------------------------------------//
 /* GLOBAL_CONST */
