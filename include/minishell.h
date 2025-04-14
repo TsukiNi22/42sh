@@ -150,6 +150,7 @@ int parser(main_data_t *data, array_t *array, char **input, int *i);
 int cmd_parser(main_data_t *data, array_t *array, char *input, int i);
 int check_syntax(main_data_t *data); // Error: KO
 int get_input_type(main_data_t *data, array_t *input); // Error: KO
+int replace_var(main_data_t *data);
 
 /* exec */
 int exe_cmd(main_data_t *data, array_t *cmd); // Error: KO

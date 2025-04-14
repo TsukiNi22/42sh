@@ -19,7 +19,7 @@ int check_syntax_setenv(main_data_t *data, array_t *input, int start)
     if (input->len - start == 1)
         return OK;
     c = ((char *) input->data[start + 1])[0];
-    if (!((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')))
+    if (!((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) && c != '_')
         return err_system(data, OK, "setenv", "Variable name "
         "must begin with a letter");
     if (!is_valid_str(input->data[start + 1]))

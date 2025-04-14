@@ -57,7 +57,8 @@ UPDATE :=	update/sys_func_update.c
 
 PARSER := 	main/parser/inputs_parser.c \
 			main/parser/input_parser.c \
-			main/parser/cmd_parser.c
+			main/parser/cmd_parser.c \
+			main/parser/replace_var.c
 
 SYNTAX := 	check_syntax/check_syntax_exit.c \
 			check_syntax/check_syntax_cd.c \
