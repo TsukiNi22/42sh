@@ -36,7 +36,7 @@ int minishell(main_data_t *data)
 {
     struct termios original;
 
-    enable_raw_mode(&original);
+    enable_raw_mode(data, &original);
     if (!data)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     if (init_data(data) == KO)

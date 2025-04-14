@@ -230,8 +230,8 @@ int free_array(char **array); // Error: KO
 int free_input(void *input); // Error: KO
 
 /* autocompletion */
-void enable_raw_mode(struct termios *original);
-int input_handler(char **input, hashtable_t *env);
+void enable_raw_mode(main_data_t *data, struct termios *original);
+int input_handler(main_data_t *data);
 
 //----------------------------------------------------------------//
 /* GLOBAL_CONST */

@@ -63,7 +63,15 @@ static char **get_cmds(hashtable_t *env)
     return cmds;
 }
 
-void enable_raw_mode(struct termios *original)
+static void print_prompt(main_data_t *data, char *str)
+{
+    printf("\n");
+    set_prompt(data);
+    if (str)
+        printf("%s", str);
+}
+
+void enable_raw_mode(main_data_t *data, struct termios *original)
 {
     struct termios raw;
 
@@ -71,15 +79,15 @@ void enable_raw_mode(struct termios *original)
     raw = *original;
     raw.c_lflag &= ~(ICANON | ECHO);
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
-    printf(">> ");
+    print_prompt(data, NULL);
     fflush(stdout);
 }
 
-static void suggest(char **prefix, int pos, hashtable_t *env)
+static void suggest(char **prefix, int pos, main_data_t *data)
 {
     int found = 0;
     size_t len = strlen(prefix[0]);
-    char **cmds = get_cmds(env);
+    char **cmds = get_cmds(data->env);
 
     prefix[0][pos] = '\0';
     printf("\n");
@@ -93,10 +101,10 @@ static void suggest(char **prefix, int pos, hashtable_t *env)
     }
     if (cmds)
         free(cmds);
+    fflush(stdout);
     if (!found)
         printf("No command matching : %s", prefix[0]);
-    printf("\n>> %s", prefix[0]);
-    fflush(stdout);
+    print_prompt(data, prefix[0]);
 }
 
 static int input_cmd(char **str, int pos, char **input)
@@ -118,7 +126,7 @@ static void backspace(char **str, int *pos)
     }
 }
 
-int input_handler(char **input, hashtable_t *env)
+int input_handler(main_data_t *data)
 {
     char *str = malloc(sizeof(char) * MAX_INPUT_STR);
     int pos = 0;
@@ -128,11 +136,11 @@ int input_handler(char **input, hashtable_t *env)
     while (1) {
         c = getchar();
         if (c == '\n')
-            return input_cmd(&str, pos, input);
+            return input_cmd(&str, pos, &(data->input));
         if (c == 127 || c == '\b')
             backspace(&str, &pos);
         if (c == '\t')
-            suggest(&str, pos, env);
+            suggest(&str, pos, data);
         if (c != '\t' && c != '\b' && isprint(c) && pos < MAX_INPUT_STR - 1) {
             str[pos] = c;
             pos++;
