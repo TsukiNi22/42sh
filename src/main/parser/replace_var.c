@@ -14,14 +14,14 @@
 
 static int replace_var_input(main_data_t *data, char **input, char *var)
 {
-    char *value = ht_search(data->env, var);
+    char *value = NULL;
 
-    if (!input || !var)
+    if (!input || !var || !data->env)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     if (!value)   
         return err_system(data, OK, var, "Undefined variable");
     for (int i = 0; i < (var - 1) - *input; i++) {
-        
+        return OK;
     }
     return OK;
 }
