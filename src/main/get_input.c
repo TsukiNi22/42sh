@@ -21,7 +21,7 @@ int get_input(main_data_t *data)
     if (!data)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     free(data->input);
-    if (delete_array(&(data->inputs), &free_input) == KO)
+    if (data->inputs && delete_array(&(data->inputs), &free_input) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     if (!data->input_redirect && set_prompt(data) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);

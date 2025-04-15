@@ -6,30 +6,42 @@
 */
 
 #include "my_string.h"
+#include "memory.h"
 #include "minishell.h"
 #include "error.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-static int replace_var_input(main_data_t *data, char **input, char *var)
+static int replace_var_input(main_data_t *data, char *var, char *end_input)
 {
+    char *new_input = NULL;
     char *value = NULL;
+    int count = 0;
 
-    if (!input || !var || !data->env)
+    if (!var || !end_input || !data)
         return err_prog(PTR_ERR, KO, ERR_INFO);
-    if (!value)   
+    value = ht_search(data->env, var);
+    if (!value)
         return err_system(data, OK, var, "Undefined variable");
-    for (int i = 0; i < (var - 1) - *input; i++) {
-        return OK;
-    }
+    count = (var - 1) - data->input;
+    count += my_strlen(value);
+    count += my_strlen(end_input);
+    if (my_malloc_c(&new_input, count) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    if (!my_strcat(new_input, data->input)
+        || !my_strcat(new_input, value)
+        || !my_strcat(new_input, end_input))
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    free(data->input);
+    data->input = new_input;
     return OK;
 }
 
 static int check_env(main_data_t *data, char *var)
 {
     char c = '\0';
-    int nb_lettre_var;
+    int nb_lettre_var = 0;
 
     if (!data)
         return OK;
@@ -45,7 +57,7 @@ static int check_env(main_data_t *data, char *var)
     }
     *(var - 1) = '\0';
     var[nb_lettre_var] = '\0';
-    replace_var_input(data, &data->input, var);
+    replace_var_input(data, var, var + nb_lettre_var + 1);
     return OK;
 }
 

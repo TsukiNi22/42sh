@@ -22,11 +22,11 @@ int do_input(main_data_t *data)
 {
     if (!data)
         return err_prog(PTR_ERR, KO, ERR_INFO);
-    if (!data->out && replace_var(data) == KO)
+    if (!data->out && !data->err_sys && replace_var(data) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
-    if (!data->out && inputs_parser(data) == KO)
+    if (!data->out && !data->err_sys && inputs_parser(data) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
-    if (!data->out && check_syntax(data) == KO)
+    if (!data->out && !data->err_sys && check_syntax(data) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     if (!data->out && !data->err_sys && exe_inputs(data) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
