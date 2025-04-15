@@ -13,14 +13,13 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-static int replace_var_input(main_data_t *data, char *var, char *end_input, char c)
+static int replace_var_input(main_data_t *data, char *var,
+    char *end_input, char c)
 {
     char *new_input = NULL;
     char *value = NULL;
     int count = 0;
 
-    if (!var || !end_input || !data)
-        return err_prog(PTR_ERR, KO, ERR_INFO);
     value = ht_search(data->env, var);
     if (!value)
         return err_system(data, OK, var, "Undefined variable");
@@ -52,7 +51,7 @@ static int check_env(main_data_t *data, char *var)
     for (nb_lettre_var = 0; var; nb_lettre_var++) {
         if (!((var[nb_lettre_var] >= '0' && var[nb_lettre_var] <= '9')
             || var[nb_lettre_var] == '_'
-            || (var[nb_lettre_var] >= 'A' && var[nb_lettre_var] <= 'Z') 
+            || (var[nb_lettre_var] >= 'A' && var[nb_lettre_var] <= 'Z')
             || (var[nb_lettre_var] >= 'a' && var[nb_lettre_var] <= 'z')))
             break;
     }
