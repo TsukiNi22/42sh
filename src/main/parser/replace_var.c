@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-static int replace_var_input(main_data_t *data, char *var, char *end_input)
+static int replace_var_input(main_data_t *data, char *var, char *end_input, char c)
 {
     char *new_input = NULL;
     char *value = NULL;
@@ -24,6 +24,7 @@ static int replace_var_input(main_data_t *data, char *var, char *end_input)
     value = ht_search(data->env, var);
     if (!value)
         return err_system(data, OK, var, "Undefined variable");
+    *end_input = c;
     count = (var - 1) - data->input;
     count += my_strlen(value);
     count += my_strlen(end_input);
@@ -56,8 +57,31 @@ static int check_env(main_data_t *data, char *var)
             break;
     }
     *(var - 1) = '\0';
+    c = var[nb_lettre_var];
     var[nb_lettre_var] = '\0';
-    replace_var_input(data, var, var + nb_lettre_var + 1);
+    replace_var_input(data, var, var + nb_lettre_var, c);
+    return OK;
+}
+
+static int check_home(main_data_t *data, char *var)
+{
+    char *my_home = ht_search(data->env, "HOME");
+    char *new_input = NULL;
+    int count = 0;
+
+    if (!my_home)
+        return err_system(data, OK, NULL, "HOME is not defined");
+    count = my_strlen(data->input) - 1;
+    *var = '\0';
+    count += my_strlen(my_home);
+    if (my_malloc_c(&new_input, count) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    if (!my_strcat(new_input, data->input)
+        || !my_strcat(new_input, my_home)
+        || !my_strcat(new_input, var + 1))
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    free(data->input);
+    data->input = new_input;
     return OK;
 }
 
@@ -69,6 +93,11 @@ int replace_var(main_data_t *data)
         if ((i == 0 || data->input[i - 1] != data->esc_char)
             && data->input[i] == '$')
             check_env(data, &data->input[i + 1]);
+        if ((i == 0 || data->input[i - 1] != data->esc_char)
+            && (i == 0 || data->input[i - 1] != '~')
+            && data->input[i + 1] != '~'
+            && data->input[i] == '~')
+            check_home(data, &data->input[i]);
     }
     return OK;
 }
