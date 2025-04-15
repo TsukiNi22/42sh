@@ -36,8 +36,7 @@ void print_error_system(char const *info, char const *err)
     }
     res += color_rgb(STDERR, 0, 255, 255);
     res += my_putstr(STDERR, err);
-    res += my_putchar(STDERR, '.');
-    res += my_putchar(STDERR, '\n');
+    res += my_putstr(STDERR, ".\n");
     res += reset_ouput(STDERR);
     if (res != OK)
         error_error();
