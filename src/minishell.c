@@ -9,11 +9,39 @@
 #include "error.h"
 #include <signal.h>
 #include <stdbool.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-static void set_signal(void)
+static void print_prompt(main_data_t *data, char *str)
 {
+    printf("\n");
+    set_prompt(data);
+    if (str)
+        printf("%s", str);
+}
+
+static void enable_raw_mode(main_data_t *data, struct termios *original)
+{
+    struct termios raw;
+
+    tcgetattr(STDIN_FILENO, original);
+    raw = *original;
+    raw.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+    print_prompt(data, NULL);
+    fflush(stdout);
+}
+
+void set_signal(void)
+{
+    struct sigaction sa;
+
+    sa.sa_handler = handle_sigint;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    sigaction(SIGINT, &sa, NULL);
     signal(SIGSEGV, handle_sigsegv);
-    signal(SIGINT, handle_sigint);
     signal(SIGTSTP, handle_sigtstp);
     signal(SIGQUIT, handle_sigquit);
 }
@@ -35,6 +63,9 @@ int do_input(main_data_t *data)
 
 int minishell(main_data_t *data)
 {
+    struct termios original;
+
+    enable_raw_mode(data, &original);
     if (!data)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     if (init_data(data) == KO)
@@ -50,5 +81,6 @@ int minishell(main_data_t *data)
         if (!data->out && do_input(data) == KO)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
     }
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &original);
     return OK;
 }
