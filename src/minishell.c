@@ -13,14 +13,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static void print_prompt(main_data_t *data, char *str)
-{
-    printf("\n");
-    set_prompt(data);
-    if (str)
-        printf("%s", str);
-}
-
 static void enable_raw_mode(main_data_t *data, struct termios *original)
 {
     struct termios raw;

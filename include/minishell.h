@@ -233,10 +233,16 @@ int free_array(char **array); // Error: KO
 int free_input(void *input); // Error: KO
 
 /* autocompletion */
+void suggest(char **prefix, int pos, main_data_t *data);
+
+/* input */
 int input_handler(main_data_t *data);
 
 /* signals */
 size_t sigint(size_t write, size_t value);
+
+/* prompt */
+void print_prompt(main_data_t *data, char *str);
 
 //----------------------------------------------------------------//
 /* GLOBAL_CONST */
