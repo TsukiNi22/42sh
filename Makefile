@@ -40,10 +40,12 @@ SIGNAL :=	handle_signal/sigsegv.c \
 			handle_signal/sigtstp.c \
 			handle_signal/sigquit.c
 
-GLOBAL :=	main.c \
+GLOBAL :=	autocompletion.c \
+			main.c \
 			const.c \
 			minishell.c \
-			free_data.c
+			free_data.c \
+			input.c
 
 MAIN := 	main/prompt.c \
 			main/get_input.c \

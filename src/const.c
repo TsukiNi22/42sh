@@ -48,7 +48,8 @@ char const *builtin_array_name[] = {
     "history",
     "source",
     "rehash",
-    ".SILENT"
+    ".SILENT",
+    NULL
 };
 
 int (* const builtin_check_syntax[])(main_data_t *, array_t *, int) = {

@@ -16,6 +16,7 @@
     #include "array.h" // array_t
     #include <stdbool.h> // boolean
     #include <time.h> // time_t
+    #include <termios.h> // termios
 
     //----------------------------------------------------------------//
     /* DEFINE */
@@ -33,6 +34,11 @@
     /* builtin */
     #define BUILTIN_MIN EXIT
     #define BUILTIN_MAX SILENT
+
+    /* input handling */
+    #define MAX_INPUT_STR 2048
+    #define VEOF 4
+    #define VSIGINT 3
 
     //----------------------------------------------------------------//
     /* MACRO */
@@ -185,6 +191,7 @@ void handle_sigsegv(int sig); // Error: None
 void handle_sigint(int sig); // Error: None
 void handle_sigtstp(int sig); // Error: None
 void handle_sigquit(int sig); // Error: None
+void set_signal(void);
 
 /* update */
 int sys_func_update(main_data_t *data); // Error: KO
@@ -225,6 +232,18 @@ int builtin_silent(main_data_t *data, array_t *input, int start);
 int free_data(main_data_t *data); // Error: EPITECH_ERR
 int free_array(char **array); // Error: KO
 int free_input(void *input); // Error: KO
+
+/* autocompletion */
+void suggest(char **prefix, int pos, main_data_t *data);
+
+/* input */
+int input_handler(main_data_t *data);
+
+/* signals */
+size_t sigint(size_t write, size_t value);
+
+/* prompt */
+void print_prompt(main_data_t *data, char *str);
 
 //----------------------------------------------------------------//
 /* GLOBAL_CONST */

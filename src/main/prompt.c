@@ -15,6 +15,7 @@
 #include "error.h"
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 static int set_relative_path(main_data_t *data)
 {
@@ -77,4 +78,13 @@ int set_prompt(main_data_t *data)
     if (res == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     return OK;
+}
+
+void print_prompt(main_data_t *data, char *str)
+{
+    printf("\n");
+    set_prompt(data);
+    if (str)
+        printf("%s", str);
+    fflush(stdout);
 }
