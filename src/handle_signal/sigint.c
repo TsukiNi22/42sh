@@ -5,9 +5,9 @@
 ** Handle sigint signal
 */
 
-#include "define.h"
 #include "macro.h"
-#include "write.h"
+#include <stdbool.h>
+#include <stdio.h>
 
 size_t sigint(size_t write, size_t value)
 {
@@ -21,5 +21,4 @@ size_t sigint(size_t write, size_t value)
 void handle_sigint(UNUSED int sig)
 {
     sigint(true, true);
-    my_putstr(STDIN, "\n");
 }

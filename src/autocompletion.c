@@ -70,7 +70,8 @@ static size_t nb_files(void)
 
     for (; dp; len++)
         dp = readdir(d);
-    return (len + 1);
+    closedir(d);
+    return len;
 }
 
 static char **list_files(void)
@@ -78,13 +79,21 @@ static char **list_files(void)
     DIR *d = opendir(".");
     struct dirent *dp = readdir(d);
     size_t len = nb_files();
-    char **cmds = malloc(sizeof(char *) * (len + 1));
+    char **cmds = malloc(sizeof(char *) * (len + 10));
+    size_t i = 0;
 
-    for (size_t i = 0; dp; i++) {
+    for (; dp; i++) {
+        if ((strlen(dp->d_name) == 1 && dp->d_name[0] == '.') ||
+        (strlen(dp->d_name) == 2 && strcmp(dp->d_name, "..") == 0)) {
+            dp = readdir(d);
+            i--;
+            continue;
+        }
         cmds[i] = strdup(dp->d_name);
         dp = readdir(d);
     }
-    cmds[len] = NULL;
+    cmds[i] = NULL;
+    closedir(d);
     return cmds;
 }
 
@@ -145,10 +154,14 @@ static size_t print_cmds(char **cmds, char **prefix, size_t index)
 void suggest(char **prefix, int pos, main_data_t *data)
 {
     size_t index = 0;
-    size_t space = get_space(prefix[0]);
-    char **cmds = init_cmds(data, prefix, &index, space);
+    size_t space = 0;
+    char **cmds = NULL;
 
     prefix[0][pos] = '\0';
+    space = get_space(prefix[0]);
+    cmds = init_cmds(data, prefix, &index, space);
+    if (!cmds)
+        return;
     if (!print_cmds(cmds, prefix, index)) {
         if (!space)
             printf("No command matching : %s", &prefix[0][index]);

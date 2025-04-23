@@ -20,7 +20,7 @@ static int input_cmd(char **str, int pos, char **input)
     *input = strdup(str[0]);
     if (str[0])
         free(str[0]);
-    return pos;
+    return EXIT_FAILURE;
 }
 
 static void backspace(char **str, int *pos)
@@ -64,6 +64,14 @@ static size_t characters_handling(main_data_t *data, char **str, int *pos,
     return EXIT_SUCCESS;
 }
 
+static void eof_handling(main_data_t *data, char *str)
+{
+    printf("exit");
+    free(str);
+    data->input = strdup("\0");
+    data->out = true;
+}
+
 int input_handler(main_data_t *data)
 {
     char *str = malloc(sizeof(char) * MAX_INPUT_STR);
@@ -77,9 +85,7 @@ int input_handler(main_data_t *data)
         if (read(STDIN_FILENO, &c, 1) < 0 && errno == EINTR)
             continue;
         if (c == VEOF) {
-            printf("exit\n");
-            free(str);
-            data->out = true;
+            eof_handling(data, str);
             break;
         }
         if (characters_handling(data, &str, &pos, c) != EXIT_SUCCESS)
