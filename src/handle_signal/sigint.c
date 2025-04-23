@@ -6,13 +6,20 @@
 */
 
 #include "define.h"
-#include "write.h"
 #include "macro.h"
-#include "error.h"
-#include <stdlib.h>
+#include "write.h"
+
+size_t sigint(size_t write, size_t value)
+{
+    static size_t n = 0;
+
+    if (write)
+        n = value;
+    return n;
+}
 
 void handle_sigint(UNUSED int sig)
 {
-    if (my_putstr(STDOUT, "\b\b  \b\b") == KO)
-        exit(EPITECH_ERR);
+    sigint(true, true);
+    my_putstr(STDIN, "\n");
 }

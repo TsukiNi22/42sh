@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <errno.h>
 
 static size_t get_array_len(const char **arr)
 {
@@ -69,32 +70,80 @@ static void print_prompt(main_data_t *data, char *str)
     set_prompt(data);
     if (str)
         printf("%s", str);
+    fflush(stdout);
 }
 
-void enable_raw_mode(main_data_t *data, struct termios *original)
+static size_t nb_files(void)
 {
-    struct termios raw;
+    DIR *d = opendir(".");
+    struct dirent *dp = readdir(d);
+    size_t len = 0;
 
-    tcgetattr(STDIN_FILENO, original);
-    raw = *original;
-    raw.c_lflag &= ~(ICANON | ECHO);
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
-    print_prompt(data, NULL);
-    fflush(stdout);
+    for (; dp; len++)
+        dp = readdir(d);
+    return (len + 1);
+}
+
+static char **list_files(void)
+{
+    DIR *d = opendir(".");
+    struct dirent *dp = readdir(d);
+    size_t len = nb_files();
+    char **cmds = malloc(sizeof(char *) * (len + 1));
+
+    for (size_t i = 0; dp; i++) {
+        cmds[i] = strdup(dp->d_name);
+        dp = readdir(d);
+    }
+    cmds[len] = NULL;
+    return cmds;
+}
+
+static size_t get_index(char *str)
+{
+    int i = strlen(str);
+
+    for (; str[i] != ' ' && i > 0; i--);
+    for (; str[i] == ' '; i++);
+    if (i < 0)
+        i = 0;
+    return i;
+}
+
+static size_t get_space(char *str)
+{
+    size_t i = 0;
+    size_t space = 0;
+
+    for (; str[i] != ' ' && str[i] != '\0'; i++);
+    if (i == 0)
+        return space;
+    for (; str[i] == ' '; i++)
+        space++;
+    return space;
 }
 
 static void suggest(char **prefix, int pos, main_data_t *data)
 {
     int found = 0;
-    size_t len = strlen(prefix[0]);
-    char **cmds = get_cmds(data->env);
+    size_t len = 0;
+    char **cmds = NULL;
+    size_t index = 0;
+    size_t space = get_space(prefix[0]);
 
+    if (!space)
+        cmds = get_cmds(data->env);
+    else {
+        cmds = list_files();
+        index = get_index(prefix[0]);
+    }
+    len = strlen(&prefix[0][index]);
     prefix[0][pos] = '\0';
     printf("\n");
     if (!cmds)
         return;
     for (size_t i = 0; cmds[i]; i++) {
-        if (strncmp(cmds[i], prefix[0], len) == 0) {
+        if (strncmp(cmds[i], &prefix[0][index], len) == 0) {
             printf("%s  ", cmds[i]);
             found = 1;
         }
@@ -102,8 +151,12 @@ static void suggest(char **prefix, int pos, main_data_t *data)
     if (cmds)
         free(cmds);
     fflush(stdout);
-    if (!found)
-        printf("No command matching : %s", prefix[0]);
+    if (!found) {
+        if (!space)
+            printf("No command matching : %s", &prefix[0][index]);
+        else
+            printf("No file or directory matching : %s", &prefix[0][index]);
+    }
     print_prompt(data, prefix[0]);
 }
 
@@ -131,10 +184,27 @@ int input_handler(main_data_t *data)
     char *str = malloc(sizeof(char) * MAX_INPUT_STR);
     int pos = 0;
     char c = 0;
+    ssize_t read_bytes = 0;
 
     str[pos] = '\0';
     while (1) {
-        c = getchar();
+        if (sigint(false, false) == 1) {
+            sigint(true, false);
+            pos = 0;
+            str[pos] = '\0';
+            print_prompt(data, NULL);
+            continue;
+        }
+        read_bytes = read(STDIN_FILENO, &c, 1);
+        if (read_bytes < 0 && errno == EINTR) {
+            continue;
+        }
+        if (c == VEOF) {
+            printf("exit\n");
+            free(str);
+            data->out = true;
+            break;
+        }
         if (c == '\n')
             return input_cmd(&str, pos, &(data->input));
         if (c == 127 || c == '\b')
@@ -148,4 +218,5 @@ int input_handler(main_data_t *data)
             fflush(stdout);
         }
     }
+    return EXIT_SUCCESS;
 }
