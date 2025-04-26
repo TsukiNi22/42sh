@@ -6,6 +6,7 @@
 */
 
 #include "write.h"
+#include "my_string.h"
 #include "memory.h"
 #include "define.h"
 #include "hashtable.h"
@@ -45,9 +46,10 @@ int main(int const argc, char const *argv[], char const *env[])
 
     if (!argv)
         return err_prog(PTR_ERR, EPITECH_ERR, ERR_INFO);
-    if (argc != 1)
+    if (argc > 2 || (argc == 2 && my_strcmp(argv[1], "-t") != 0))
         return err_custom("Why argument? "
-        "When you can give NOTHING!!!", EPITECH_ERR, ERR_INFO);
+        "When you can give NOTHING!!! or '-t'", EPITECH_ERR, ERR_INFO);
+    data.pty = (argc == 2);
     if (set_env(&data, env) == KO)
         return err_prog(UNDEF_ERR, EPITECH_ERR, ERR_INFO);
     res = minishell(&data);

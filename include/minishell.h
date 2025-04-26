@@ -102,6 +102,7 @@ typedef struct main_data_s {
     bool input_redirect;
 
     /* input_var */
+    bool pty;
     bool builtin;
     bool binary;
     builtin_func_t builtin_val;
