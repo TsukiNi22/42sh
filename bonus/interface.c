@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/select.h>
+#include <sys/wait.h>
 #include <stdbool.h>
 
 #define MAX_LINES 30
@@ -19,6 +20,64 @@ typedef struct {
     int line_count;
     int actual_ligne;
 } LineBuffer;
+
+void run_command(char *command)
+{
+    pid_t pid;
+    char *args[10]; // tableau d'arguments (max 9 mots + NULL)
+    int i = 0;
+    char *token;
+
+    if (!command)
+        return;
+
+    // Split la commande (très simple split sur les espaces)
+    token = strtok(command, " ");
+    while (token && i < 9) {
+        args[i++] = token;
+        token = strtok(NULL, " ");
+    }
+    args[i] = NULL; // très important : terminer le tableau par NULL
+
+    pid = fork();
+    if (pid < 0) {
+        perror("fork");
+        exit(EXIT_FAILURE);
+    }
+    if (pid == 0) {
+        // Fils : on exécute
+        if (execvp(args[0], args) == -1) { // execvp cherche dans $PATH
+            perror("execvp");
+            exit(EXIT_FAILURE);
+        }
+    } else {
+        // Parent : attend
+        wait(NULL);
+    }
+}
+
+char *cat_str(char *first, char *second)
+{
+    char *new_str;
+    size_t len_first = first ? strlen(first) : 0;
+    size_t len_second = second ? strlen(second) : 0;
+
+    new_str = malloc(len_first + len_second + 1);
+    if (!new_str)
+        return NULL;
+    
+    if (first)
+        memcpy(new_str, first, len_first);
+    if (second)
+        memcpy(new_str + len_first, second, len_second);
+
+    new_str[len_first + len_second] = '\0';
+
+    if (first)
+        free(first);
+    
+    return new_str;
+}
 
 static int get_size(char *line)
 {
@@ -85,6 +144,14 @@ int main()
                     current_pos = 0;
                     memset(current_line, 0, sizeof(current_line));
                     buffer.actual_ligne = buffer.line_count;
+                    char *cmd = NULL;
+
+                    for (int i = 0; i < MAX_LINES; i++) {
+                        if (buffer.apartenance[i] == buffer.last_apartenance)
+                            cmd = cat_str(cmd, buffer.lines[i]);
+                    }
+                    if (cmd)
+                        run_command(cmd);
                 } else if (c == 127 || c == 8) { // Backspace
                     if (current_pos > 0) {
                         current_pos--;
