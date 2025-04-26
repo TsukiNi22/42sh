@@ -8,6 +8,7 @@
 #include <sys/select.h>
 #include <sys/wait.h>
 #include <stdbool.h>
+#include <pty.h>
 
 #define MAX_LINES 30
 #define MAX_LINE_LENGTH 90
@@ -23,6 +24,15 @@ typedef struct {
 
 void run_command(char *command)
 {
+    int master_fd, slave_fd;
+    char slave_name[100];
+
+    // Créer un PTY
+    if (openpty(&master_fd, &slave_fd, slave_name, NULL, NULL) == -1) {
+        perror("openpty");
+        exit(1);
+    }
+
     pid_t pid;
     char *args[10]; // tableau d'arguments (max 9 mots + NULL)
     int i = 0;
@@ -45,12 +55,24 @@ void run_command(char *command)
         exit(EXIT_FAILURE);
     }
     if (pid == 0) {
+        if (dup2(slave_fd, STDOUT_FILENO) == -1 || dup2(slave_fd, STDERR_FILENO) == -1) {
+            perror("dup2");
+            exit(1);
+        }
         // Fils : on exécute
         if (execvp(args[0], args) == -1) { // execvp cherche dans $PATH
             perror("execvp");
             exit(EXIT_FAILURE);
         }
     } else {
+        char buffer[1024];
+        int nbytes;
+        close(slave_fd);  // Fermer le descripteur de fichier dans le parent
+
+        // Lire depuis le PTY maître
+        while ((nbytes = read(master_fd, buffer, sizeof(buffer))) > 0) {
+            write(STDOUT_FILENO, buffer, nbytes);  // Afficher dans le terminal principal
+        }
         // Parent : attend
         wait(NULL);
     }
@@ -144,8 +166,8 @@ int main()
                     current_pos = 0;
                     memset(current_line, 0, sizeof(current_line));
                     buffer.actual_ligne = buffer.line_count;
-                    char *cmd = NULL;
 
+                    char *cmd = NULL;
                     for (int i = 0; i < MAX_LINES; i++) {
                         if (buffer.apartenance[i] == buffer.last_apartenance)
                             cmd = cat_str(cmd, buffer.lines[i]);
