@@ -250,7 +250,7 @@ int main()
     // SFML setup
     sfRenderWindow* window;
     sfVideoMode mode = {800, 600, 32};
-    window = sfRenderWindow_create(mode, "Terminal Viewer", sfClose, NULL);
+    window = sfRenderWindow_create(mode, "Banana and Shell Handler", sfClose, NULL);
     if (!window)
         return 1;
 
