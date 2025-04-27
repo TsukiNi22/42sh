@@ -125,6 +125,15 @@ void run_command(char *command, sfRenderWindow *window, sfFont *font, sfClock *c
         return;
     if (strncmp(command, "exit", 4) == 0)
         exit(0);
+    
+    if (strncmp(command, "clear", 5) == 0) {
+        memset(buffer->lines, 0, sizeof(char) * (MAX_LINES - 1) * MAX_LINE_LENGTH);
+        memset(buffer->apartenance, 0, sizeof(int) * (MAX_LINES - 1));
+        buffer->last_apartenance = -1;
+        buffer->line_count = 0;
+        buffer->actual_ligne = 0;
+        return;
+    }
 
     pid_t pid;
     char *args[100]; // tableau d'arguments (max 9 mots + NULL)
