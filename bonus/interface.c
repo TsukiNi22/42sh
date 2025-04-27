@@ -121,24 +121,23 @@ void run_command(char *command, sfRenderWindow *window, sfFont *font, sfClock *c
         exit(1);
     }
 
+    if (!command)
+        return;
+    if (strncmp(command, "exit", 4) == 0)
+        exit(0);
+
     pid_t pid;
-    char *args[10]; // tableau d'arguments (max 9 mots + NULL)
+    char *args[100]; // tableau d'arguments (max 9 mots + NULL)
     int i = 0;
     char *token;
 
-    if (!command)
-        return;
-
     // Split la commande (très simple split sur les espaces)
-    token = strtok(command, " ");
-    while (token && i < 9) {
+    token = strtok(command, " \t");
+    while (token && i < 100) {
         args[i++] = token;
-        token = strtok(NULL, " ");
+        token = strtok(NULL, " \t");
     }
     args[i] = NULL; // très important : terminer le tableau par NULL
-
-    if (strncmp(command, "exit", 4) == 0)
-        exit(0);
 
     pid = fork();
     if (pid < 0) {
