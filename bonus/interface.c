@@ -140,18 +140,17 @@ void run_command(char *command, sfRenderWindow *window, sfFont *font, sfClock *c
     pid = fork();
     if (pid < 0) {
         perror("fork");
-        exit(EXIT_FAILURE);
+        exit(1);
     }
     if (pid == 0) {
         if (dup2(slave_fd, STDOUT_FILENO) == -1 || dup2(slave_fd, STDERR_FILENO) == -1) {
             perror("dup2");
-            exit(1);
+            _exit(1);
         }
         // Fils : on exécute
-        if (execvp(args[0], args) == -1) { // execvp cherche dans $PATH
-            perror("execvp");
-            exit(EXIT_FAILURE);
-        }
+        execvp(args[0], args); // execvp cherche dans $PATH
+        perror("execvp");
+        _exit(1);
     } else {
         char str[1024];
         int nbytes;
@@ -202,7 +201,7 @@ void run_command(char *command, sfRenderWindow *window, sfFont *font, sfClock *c
                     }
                 }
             }
-         
+            
             // Afficher la fenêtre
             display(window, font, cursor_clock, *buffer, current_line);
         }
