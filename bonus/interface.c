@@ -22,7 +22,95 @@ typedef struct {
     int actual_ligne;
 } LineBuffer;
 
-void run_command(char *command)
+static int get_size(char *line)
+{
+    int size = 0;
+
+    for (int i = 0; line[i]; i++) {
+        if (line[i] == '\t')
+            size += 8 * 4;
+        else
+            size += 8;
+    }
+    return size;
+}
+
+static void prompt(sfRenderWindow *window, sfFont *font, int i)
+{
+    sfText* text = sfText_create();
+    sfText_setString(text, "$> ");
+    sfText_setFont(text, font);
+    sfText_setCharacterSize(text, 13);
+    sfText_setPosition(text, (sfVector2f){10, 10 + i * 18});
+    sfText_setColor(text, sfWhite);
+    sfRenderWindow_drawText(window, text, NULL);
+    sfText_destroy(text);
+}
+
+static void display(sfRenderWindow *window, sfFont *font, sfClock *cursor_clock, LineBuffer buffer, char *current_line)
+{
+    // Clear window
+    sfRenderWindow_clear(window, sfBlack);
+
+    // Affiche toutes les lignes précédentes
+    int apartenance = 0;
+    bool new = false;
+    for (int i = 0; i < buffer.actual_ligne; ++i) {
+        if ((i == 0 || apartenance != buffer.apartenance[i]) && buffer.apartenance[i] != -1) {
+            prompt(window, font, i);
+            apartenance = buffer.apartenance[i];
+            new = true;
+        }
+        sfText* text = sfText_create();
+        sfText_setString(text, buffer.lines[i]);
+        sfText_setFont(text, font);
+        sfText_setCharacterSize(text, 13);
+        sfText_setPosition(text, (sfVector2f){10 + 8 * 3 * new, 10 + i * 18});
+        sfText_setColor(text, sfWhite);
+        sfRenderWindow_drawText(window, text, NULL);
+        sfText_destroy(text);
+        new = false;
+    }
+
+    // Affiche la ligne en cours d'écriture
+    prompt(window, font, buffer.actual_ligne);
+    for (int i = buffer.actual_ligne; i < buffer.line_count; ++i) {
+        sfText* text = sfText_create();
+        sfText_setString(text, buffer.lines[i]);
+        sfText_setFont(text, font);
+        sfText_setCharacterSize(text, 13);
+        sfText_setPosition(text, (sfVector2f){10 + 8 * 3 * (i == buffer.actual_ligne), 10 + i * 18});
+        sfText_setColor(text, sfGreen);
+        sfRenderWindow_drawText(window, text, NULL);
+        sfText_destroy(text);
+    }
+
+    // Afficher le buffer actuel
+    sfText* text = sfText_create();
+    sfText_setString(text, current_line);
+    sfText_setFont(text, font);
+    sfText_setCharacterSize(text, 13);
+    sfText_setPosition(text, (sfVector2f){10 + 8 * 3 * (buffer.actual_ligne == buffer.line_count), 10 + buffer.line_count * 18});
+    sfText_setColor(text, sfGreen);
+    sfRenderWindow_drawText(window, text, NULL);
+    sfText_destroy(text);
+    
+
+    // Curseur clignotant
+    sfTime time = sfClock_getElapsedTime(cursor_clock);
+    if ((time.microseconds / 500000) % 2 == 0) { // clignote toutes les 0.5s
+        sfRectangleShape* cursor = sfRectangleShape_create();
+        sfRectangleShape_setSize(cursor, (sfVector2f){8, 13});
+        sfRectangleShape_setFillColor(cursor, sfGreen);
+        sfRectangleShape_setPosition(cursor, (sfVector2f){2.5 + 8 * 3 * (buffer.actual_ligne == buffer.line_count) + 8 + get_size(current_line), 10 + buffer.line_count * 18});
+        sfRenderWindow_drawRectangleShape(window, cursor, NULL);
+        sfRectangleShape_destroy(cursor);
+    }
+
+    sfRenderWindow_display(window);
+}
+
+void run_command(char *command, sfRenderWindow *window, sfFont *font, sfClock *cursor_clock, LineBuffer *buffer, char *current_line)
 {
     int master_fd, slave_fd;
     char slave_name[100];
@@ -65,14 +153,60 @@ void run_command(char *command)
             exit(EXIT_FAILURE);
         }
     } else {
-        char buffer[1024];
+        char str[1024];
         int nbytes;
+        int current_pos = 0;
         close(slave_fd);  // Fermer le descripteur de fichier dans le parent
 
-        // Lire depuis le PTY maître
-        while ((nbytes = read(master_fd, buffer, sizeof(buffer))) > 0) {
-            write(STDOUT_FILENO, buffer, nbytes);  // Afficher dans le terminal principal
+        while ((nbytes = read(master_fd, str, sizeof(str))) > 0) {
+            for (int i = 0; i < nbytes; ++i) {
+                char c = str[i];
+         
+                if (c == '\n' || get_size(current_line) >= MAX_LINE_SIZE - 1) {
+
+                    // Terminer la ligne actuelle
+                    current_line[current_pos] = '\0';
+         
+                    // Si trop de lignes, on supprime la plus ancienne
+                    if (buffer->line_count >= MAX_LINES) {
+                        memmove(buffer->lines, buffer->lines + 1, (MAX_LINES - 1) * MAX_LINE_LENGTH);
+                        memmove(buffer->apartenance, buffer->apartenance + 1, (MAX_LINES - 1) * sizeof(int));
+                        buffer->line_count--;
+                    }
+         
+                    buffer->apartenance[buffer->line_count] = -1;
+                    strcpy(buffer->lines[buffer->line_count++], current_line);
+         
+                    // Reset pour la prochaine ligne
+                    current_pos = 0;
+                    memset(current_line, 0, sizeof(current_line));
+                    buffer->actual_ligne = buffer->line_count;
+                }
+
+                if (c != '\n') { // On n'ajoute pas '\n' dans la ligne (on l'utilise juste comme déclencheur)
+                    if (get_size(current_line) < MAX_LINE_SIZE - 8) {
+                        current_line[current_pos++] = c;
+                        current_line[current_pos] = '\0';
+                    } else {
+                        current_line[current_pos] = '\0';
+                        if (buffer->line_count >= MAX_LINES) {
+                            memmove(buffer->lines, buffer->lines + 1, (MAX_LINES - 1) * MAX_LINE_LENGTH);
+                            memmove(buffer->apartenance, buffer->apartenance + 1, (MAX_LINES - 1) * sizeof(int));
+                            buffer->line_count--;
+                            buffer->actual_ligne--;
+                        }
+                        buffer->apartenance[buffer->line_count] = -1;
+                        strcpy(buffer->lines[buffer->line_count++], current_line);
+                        current_pos = 0;
+                        memset(current_line, 0, sizeof(current_line));
+                    }
+                }
+            }
+         
+            // Afficher la fenêtre
+            display(window, font, cursor_clock, *buffer, current_line);
         }
+        
         // Parent : attend
         wait(NULL);
     }
@@ -99,31 +233,6 @@ char *cat_str(char *first, char *second)
         free(first);
     
     return new_str;
-}
-
-static int get_size(char *line)
-{
-    int size = 0;
-
-    for (int i = 0; line[i]; i++) {
-        if (line[i] == '\t')
-            size += 8 * 4;
-        else
-            size += 8;
-    }
-    return size;
-}
-
-static void prompt(sfRenderWindow *window, sfFont *font, int i)
-{
-    sfText* text = sfText_create();
-    sfText_setString(text, "$> ");
-    sfText_setFont(text, font);
-    sfText_setCharacterSize(text, 13);
-    sfText_setPosition(text, (sfVector2f){10, 10 + i * 18});
-    sfText_setColor(text, sfWhite);
-    sfRenderWindow_drawText(window, text, NULL);
-    sfText_destroy(text);
 }
 
 int main()
@@ -158,6 +267,7 @@ int main()
                     current_line[current_pos] = '\0';
                     if (buffer.line_count >= MAX_LINES) {
                         memmove(buffer.lines, buffer.lines + 1, (MAX_LINES - 1) * MAX_LINE_LENGTH);
+                        memmove(buffer.apartenance, buffer.apartenance + 1, (MAX_LINES - 1) * sizeof(int));
                         buffer.line_count--;
                     }
                     buffer.apartenance[buffer.line_count] = buffer.last_apartenance + 1;
@@ -173,7 +283,7 @@ int main()
                             cmd = cat_str(cmd, buffer.lines[i]);
                     }
                     if (cmd)
-                        run_command(cmd);
+                        run_command(cmd, window, font, cursor_clock, &buffer, current_line);
                 } else if (c == 127 || c == 8) { // Backspace
                     if (current_pos > 0) {
                         current_pos--;
@@ -194,6 +304,7 @@ int main()
                         current_line[current_pos] = '\0';
                         if (buffer.line_count >= MAX_LINES) {
                             memmove(buffer.lines, buffer.lines + 1, (MAX_LINES - 1) * MAX_LINE_LENGTH);
+                            memmove(buffer.apartenance, buffer.apartenance + 1, (MAX_LINES - 1) * sizeof(int));
                             buffer.line_count--;
                             buffer.actual_ligne--;
                         }
@@ -206,65 +317,7 @@ int main()
             }
         }
 
-        // Clear window
-        sfRenderWindow_clear(window, sfBlack);
-
-        // Affiche toutes les lignes précédentes
-        int apartenance = 0;
-        bool new = false;
-        for (int i = 0; i < buffer.actual_ligne; ++i) {
-            if (i == 0 || apartenance != buffer.apartenance[i]) {
-                prompt(window, font, i);
-                apartenance = buffer.apartenance[i];
-                new = true;
-            }
-            sfText* text = sfText_create();
-            sfText_setString(text, buffer.lines[i]);
-            sfText_setFont(text, font);
-            sfText_setCharacterSize(text, 13);
-            sfText_setPosition(text, (sfVector2f){10 + 8 * 3 * new, 10 + i * 18});
-            sfText_setColor(text, sfWhite);
-            sfRenderWindow_drawText(window, text, NULL);
-            sfText_destroy(text);
-            new = false;
-        }
-
-        // Affiche la ligne en cours d'écriture
-        prompt(window, font, buffer.actual_ligne);
-        for (int i = buffer.actual_ligne; i < buffer.line_count; ++i) {
-            sfText* text = sfText_create();
-            sfText_setString(text, buffer.lines[i]);
-            sfText_setFont(text, font);
-            sfText_setCharacterSize(text, 13);
-            sfText_setPosition(text, (sfVector2f){10 + 8 * 3 * (i == buffer.actual_ligne), 10 + i * 18});
-            sfText_setColor(text, sfGreen);
-            sfRenderWindow_drawText(window, text, NULL);
-            sfText_destroy(text);
-        }
-
-        // Afficher le buffer actuel
-        sfText* text = sfText_create();
-        sfText_setString(text, current_line);
-        sfText_setFont(text, font);
-        sfText_setCharacterSize(text, 13);
-        sfText_setPosition(text, (sfVector2f){10 + 8 * 3 * (buffer.actual_ligne == buffer.line_count), 10 + buffer.line_count * 18});
-        sfText_setColor(text, sfGreen);
-        sfRenderWindow_drawText(window, text, NULL);
-        sfText_destroy(text);
-        
-
-        // Curseur clignotant
-        sfTime time = sfClock_getElapsedTime(cursor_clock);
-        if ((time.microseconds / 500000) % 2 == 0) { // clignote toutes les 0.5s
-            sfRectangleShape* cursor = sfRectangleShape_create();
-            sfRectangleShape_setSize(cursor, (sfVector2f){8, 13});
-            sfRectangleShape_setFillColor(cursor, sfGreen);
-            sfRectangleShape_setPosition(cursor, (sfVector2f){2.5 + 8 * 3 * (buffer.actual_ligne == buffer.line_count) + 8 + get_size(current_line), 10 + buffer.line_count * 18});
-            sfRenderWindow_drawRectangleShape(window, cursor, NULL);
-            sfRectangleShape_destroy(cursor);
-        }
-
-        sfRenderWindow_display(window);
+        display(window, font, cursor_clock, buffer, current_line);
     }
 
     // Cleanup
