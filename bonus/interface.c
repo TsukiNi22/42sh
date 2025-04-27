@@ -137,6 +137,9 @@ void run_command(char *command, sfRenderWindow *window, sfFont *font, sfClock *c
     }
     args[i] = NULL; // très important : terminer le tableau par NULL
 
+    if (strncmp(command, "exit", 4) == 0)
+        exit(0);
+
     pid = fork();
     if (pid < 0) {
         perror("fork");
