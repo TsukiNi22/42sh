@@ -172,7 +172,7 @@ void run_command(char *command, sfRenderWindow *window, sfFont *font, sfClock *c
             for (int i = 0; i < nbytes; ++i) {
                 char c = str[i];
          
-                if (c == '\n' || get_size(current_line) >= MAX_LINE_SIZE - 1) {
+                if (c == '\n' || get_size(current_line) >= MAX_LINE_SIZE - 8) {
 
                     // Terminer la ligne actuelle
                     current_line[current_pos] = '\0';
@@ -191,9 +191,7 @@ void run_command(char *command, sfRenderWindow *window, sfFont *font, sfClock *c
                     current_pos = 0;
                     memset(current_line, 0, sizeof(current_line));
                     buffer->actual_ligne = buffer->line_count;
-                }
-
-                if (c != '\n') { // On n'ajoute pas '\n' dans la ligne (on l'utilise juste comme déclencheur)
+                } else if (c == 9 || c >= 32 && c <= 126) { // Caractères imprimables + tab
                     if (get_size(current_line) < MAX_LINE_SIZE - 8) {
                         current_line[current_pos++] = c;
                         current_line[current_pos] = '\0';
@@ -216,7 +214,26 @@ void run_command(char *command, sfRenderWindow *window, sfFont *font, sfClock *c
             // Afficher la fenêtre
             display(window, font, cursor_clock, *buffer, current_line);
         }
-        
+
+        if (strlen(current_line) > 0) {
+             current_line[current_pos] = '\0';
+             
+             // Si trop de lignes, on supprime la plus ancienne
+             if (buffer->line_count >= MAX_LINES) {
+                 memmove(buffer->lines, buffer->lines + 1, (MAX_LINES - 1) * MAX_LINE_LENGTH);
+                 memmove(buffer->apartenance, buffer->apartenance + 1, (MAX_LINES - 1) * sizeof(int));
+                 buffer->line_count--;
+             }
+             
+             buffer->apartenance[buffer->line_count] = -1;
+             strcpy(buffer->lines[buffer->line_count++], current_line);
+             
+             // Reset pour la prochaine ligne
+             current_pos = 0;
+             memset(current_line, 0, sizeof(current_line));
+             buffer->actual_ligne = buffer->line_count;
+        }
+
         // Parent : attend
         wait(NULL);
     }
