@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 #include <sys/select.h>
 #include <sys/wait.h>
 #include <stdbool.h>
@@ -112,15 +113,6 @@ static void display(sfRenderWindow *window, sfFont *font, sfClock *cursor_clock,
 
 void run_command(char *command, sfRenderWindow *window, sfFont *font, sfClock *cursor_clock, LineBuffer *buffer, char *current_line)
 {
-    int master_fd, slave_fd;
-    char slave_name[100];
-
-    // Créer un PTY
-    if (openpty(&master_fd, &slave_fd, slave_name, NULL, NULL) == -1) {
-        perror("openpty");
-        exit(1);
-    }
-
     if (!command)
         return;
     if (strncmp(command, "exit", 4) == 0)
@@ -148,16 +140,15 @@ void run_command(char *command, sfRenderWindow *window, sfFont *font, sfClock *c
     }
     args[i] = NULL; // très important : terminer le tableau par NULL
 
-    pid = fork();
+    int master_fd;
+    struct winsize ws = {30, 90, 0, 0};
+
+    pid = forkpty(&master_fd, NULL, NULL, &ws);
     if (pid < 0) {
         perror("fork");
         exit(1);
     }
     if (pid == 0) {
-        if (dup2(slave_fd, STDOUT_FILENO) == -1 || dup2(slave_fd, STDERR_FILENO) == -1) {
-            perror("dup2");
-            _exit(1);
-        }
         // Fils : on exécute
         execvp(args[0], args); // execvp cherche dans $PATH
         perror("execvp");
@@ -166,9 +157,19 @@ void run_command(char *command, sfRenderWindow *window, sfFont *font, sfClock *c
         char str[1024];
         int nbytes;
         int current_pos = 0;
-        close(slave_fd);  // Fermer le descripteur de fichier dans le parent
 
         while ((nbytes = read(master_fd, str, sizeof(str))) > 0) {
+            sfEvent event;
+            while (sfRenderWindow_pollEvent(window, &event)) {
+                if (event.type == sfEvtClosed) {
+                    sfRenderWindow_close(window);
+                } else if (event.type == sfEvtTextEntered) {
+                    char c = event.text.unicode;
+                    if (c == 3) // ctrl + c
+                        kill(pid, SIGKILL);
+                }
+            }
+            
             for (int i = 0; i < nbytes; ++i) {
                 char c = str[i];
          
@@ -242,7 +243,8 @@ void run_command(char *command, sfRenderWindow *window, sfFont *font, sfClock *c
         }
 
         // Parent : attend
-        wait(NULL);
+        int status = 0;
+        waitpid(pid, &status, WUNTRACED);
     }
 }
 
