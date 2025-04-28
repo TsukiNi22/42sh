@@ -15,7 +15,7 @@
 #define MAX_LINE_SIZE (MAX_LINE_LENGTH * 8)
 
 typedef struct {
-    char lines[MAX_LINES][MAX_LINE_LENGTH];
+    char lines[MAX_LINES][MAX_LINE_LENGTH + 1];
     int last_apartenance;
     int apartenance[MAX_LINES];
     int line_count;
@@ -191,8 +191,11 @@ void run_command(char *command, sfRenderWindow *window, sfFont *font, sfClock *c
                     current_pos = 0;
                     memset(current_line, 0, sizeof(current_line));
                     buffer->actual_ligne = buffer->line_count;
-                } else if (c == 9 || c >= 32 && c <= 126) { // Caractères imprimables + tab
+                } else {
                     if (get_size(current_line) < MAX_LINE_SIZE - 8) {
+                        if (!((c >= 32 && c <= 126) || (c >= 7 && c <= 13))) {
+                            c = -80;
+                        }
                         current_line[current_pos++] = c;
                         current_line[current_pos] = '\0';
                     } else {
@@ -227,6 +230,10 @@ void run_command(char *command, sfRenderWindow *window, sfFont *font, sfClock *c
              
              buffer->apartenance[buffer->line_count] = -1;
              strcpy(buffer->lines[buffer->line_count++], current_line);
+             
+             int len = strlen(buffer->lines[buffer->line_count - 1]);
+             buffer->lines[buffer->line_count - 1][len] = '%';
+             buffer->lines[buffer->line_count - 1][len + 1] = '\0';
              
              // Reset pour la prochaine ligne
              current_pos = 0;
