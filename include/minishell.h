@@ -245,6 +245,9 @@ size_t sigint(size_t write, size_t value);
 /* prompt */
 void print_prompt(main_data_t *data, char *str);
 
+/* arrows */
+int arrows(int *cursor_pos, int len);
+
 //----------------------------------------------------------------//
 /* GLOBAL_CONST */
 
