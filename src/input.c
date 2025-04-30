@@ -59,6 +59,10 @@ static size_t characters_handling(main_data_t *data, char **str, int *pos,
         backspace(str, pos);
     if (c == '\t')
         suggest(str, *pos, data);
+    if (c == 27) {
+        if (arrows(pos, strlen(*str)))
+            return EXIT_SUCCESS;
+    }
     if (c != '\t' && c != '\b' && isprint(c) && *pos < MAX_INPUT_STR - 1)
         add_char(c, str, pos);
     return EXIT_SUCCESS;

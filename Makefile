@@ -46,7 +46,8 @@ GLOBAL :=	autocompletion.c \
 			const.c \
 			minishell.c \
 			free_data.c \
-			input.c
+			input.c	\
+			arrows.c	\
 
 MAIN := 	main/prompt.c \
 			main/get_input.c \
