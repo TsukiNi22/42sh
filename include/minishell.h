@@ -138,6 +138,9 @@ typedef struct main_data_s {
     /* input */
     char *input;
     array_t *inputs;
+
+    /*arrow*/
+    int nb_press;
 } main_data_t;
 
 //----------------------------------------------------------------//
@@ -246,7 +249,7 @@ size_t sigint(size_t write, size_t value);
 void print_prompt(main_data_t *data, char *str);
 
 /* arrows */
-int arrows(int *cursor_pos, int len);
+int arrows(main_data_t *data, int *cursor_pos, int str_len, char **str);
 
 //----------------------------------------------------------------//
 /* GLOBAL_CONST */

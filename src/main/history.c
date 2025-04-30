@@ -97,9 +97,9 @@ int add_history(main_data_t *data, hashtable_t *env, char *input)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     path = get_full_path(ht_search(env, "HOME"), HISTORY_FILE);
     if (data->input_redirect || !path)
-        return OK;
+    return OK;
     if (create_file(path) == KO)
-        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    return err_prog(UNDEF_ERR, KO, ERR_INFO);
     file = get_file(path);
     if (!file || check_last(input, file))
         return OK;

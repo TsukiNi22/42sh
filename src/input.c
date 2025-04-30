@@ -16,6 +16,8 @@
 
 static int input_cmd(char **str, int pos, char **input)
 {
+    if (!str)
+        return EXIT_FAILURE;
     str[0][pos] = '\0';
     *input = strdup(str[0]);
     if (str[0])
@@ -25,6 +27,8 @@ static int input_cmd(char **str, int pos, char **input)
 
 static void backspace(char **str, int *pos)
 {
+    if (!str)
+        return;
     if (*pos > 0) {
         *pos -= 1;
         str[0][*pos] = '\0';
@@ -35,6 +39,8 @@ static void backspace(char **str, int *pos)
 
 static size_t cc_handler(main_data_t *data, int *pos, char **str)
 {
+    if (!str)
+        return EXIT_FAILURE;
     sigint(true, false);
     *pos = 0;
     str[0][*pos] = '\0';
@@ -44,6 +50,8 @@ static size_t cc_handler(main_data_t *data, int *pos, char **str)
 
 static void add_char(char c, char **str, int *pos)
 {
+    if (!str)
+        return;
     str[0][*pos] = c;
     *pos += 1;
     putchar(c);
@@ -53,6 +61,8 @@ static void add_char(char c, char **str, int *pos)
 static size_t characters_handling(main_data_t *data, char **str, int *pos,
     char c)
 {
+    if (!str)
+        return EXIT_FAILURE;
     if (c == '\n')
         return input_cmd(str, *pos, &(data->input));
     if (c == 127 || c == '\b')
@@ -60,7 +70,7 @@ static size_t characters_handling(main_data_t *data, char **str, int *pos,
     if (c == '\t')
         suggest(str, *pos, data);
     if (c == 27) {
-        if (arrows(pos, strlen(*str)))
+        if (arrows(data, pos, strlen(*str), str))
             return EXIT_SUCCESS;
     }
     if (c != '\t' && c != '\b' && isprint(c) && *pos < MAX_INPUT_STR - 1)
@@ -81,6 +91,7 @@ int input_handler(main_data_t *data)
     char *str = malloc(sizeof(char) * MAX_INPUT_STR);
     int pos = 0;
     char c = 0;
+    data->nb_press = 0;
 
     str[pos] = '\0';
     while (1) {

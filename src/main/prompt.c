@@ -82,7 +82,10 @@ int set_prompt(main_data_t *data)
 
 void print_prompt(main_data_t *data, char *str)
 {
-    printf("\n");
+    if (my_strcmp(str, "no_\n") != 0)
+        printf("\n");
+    if (my_strcmp(str, "no_\n") == 0)
+        str = NULL;
     set_prompt(data);
     if (str)
         printf("%s", str);
