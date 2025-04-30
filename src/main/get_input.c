@@ -17,7 +17,8 @@ size_t choose_input(main_data_t *data)
 {
     int res = 0;
 
-    if (data->input_redirect && getline(&(data->input), (size_t *){0}, stdin) == KO)
+    if (data->input_redirect &&
+        getline(&(data->input), (size_t *){0}, stdin) == KO)
         data->out = true;
     if (!data->input_redirect) {
         res = input_handler(data);
