@@ -39,7 +39,7 @@ static int prompt(sfRenderWindow *window, sfFont *font, int i)
     return OK;
 }
 
-static int text(terminal_buffer_t *terminal, char *str, int x, int y)
+static int text(terminal_buffer_t *terminal, char *str, int x, int y, sfColor color)
 {
     sfText *text = NULL;
 
@@ -52,7 +52,7 @@ static int text(terminal_buffer_t *terminal, char *str, int x, int y)
     sfText_setFont(text, terminal->font);
     sfText_setCharacterSize(text, 13);
     sfText_setPosition(text, (sfVector2f){x, y});
-    sfText_setColor(text, sfWhite);
+    sfText_setColor(text, color);
     sfRenderWindow_drawText(terminal->window, text, NULL);
     sfText_destroy(text);
     return OK;
@@ -72,7 +72,7 @@ static int diplay_past_line(terminal_buffer_t *terminal)
             apartenance = terminal->apartenance[i];
             new = true;
         }
-        text(terminal, terminal->lines[i], 10 + 8 * 3 * new, 10 + i * 18);
+        text(terminal, terminal->lines[i], 10 + 8 * 3 * new, 10 + i * 18, sfWhite);
         new = false;
     }
     return OK;
@@ -84,8 +84,7 @@ static int diplay_actual_line(terminal_buffer_t *terminal)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     prompt(terminal->window, terminal->font, terminal->actual_ligne);
     for (int i = terminal->actual_ligne; i < terminal->line_count; ++i)
-        text(terminal, terminal->lines[i],
-        10 + 8 * 3 * (i == terminal->actual_ligne), 10 + i * 18);
+        text(terminal, terminal->lines[i], 10 + 8 * 3 * (i == terminal->actual_ligne), 10 + i * 18, sfGreen);
     return OK;
 }
 
@@ -121,7 +120,7 @@ int display_pty(main_data_t *data)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     text(data->terminal, data->terminal->current_line, 10 + 8 * 3 *
     (data->terminal->actual_ligne == data->terminal->line_count),
-    10 + data->terminal->line_count * 18);
+    10 + data->terminal->line_count * 18, sfGreen);
     if (cursor(data->terminal) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     sfRenderWindow_display(data->terminal->window);
