@@ -25,8 +25,12 @@ int get_input(main_data_t *data)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     if (!data->input_redirect && set_prompt(data) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
-    res = input_handler(data);
-    printf("\n");
+    if (data->input_redirect && getline(&(data->input), (size_t *){0}, stdin) == KO)
+        data->out = true;
+    if (!data->input_redirect) {
+        res = input_handler(data);
+        printf("\n");
+    }
     if (res == KO) {
         data->out = true;
         if (!data->input_redirect)
