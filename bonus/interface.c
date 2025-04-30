@@ -165,8 +165,10 @@ void run_command(char *command, sfRenderWindow *window, sfFont *font, sfClock *c
                     sfRenderWindow_close(window);
                 } else if (event.type == sfEvtTextEntered) {
                     char c = event.text.unicode;
-                    if (c == 3) // ctrl + c
+                    if (c == 3 || c == 'q') // ctrl + c
                         kill(pid, SIGKILL);
+                    else if (c == 4) // Ctrl+D, EOF (peut être ajusté pour SIGTERM)
+                        kill(pid, SIGTERM);
                 }
             }
             
