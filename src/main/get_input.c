@@ -26,7 +26,7 @@ int get_input(main_data_t *data)
     if (!data->pty && !data->input_redirect && set_prompt(data) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     res = input_handler(data);
-    printf("\n");
+    printf("%c", '\n' * !data->pty);
     if (res == KO) {
         data->out = true;
         if (!data->input_redirect)

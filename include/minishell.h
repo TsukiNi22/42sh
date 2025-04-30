@@ -17,6 +17,7 @@
     #include <stdbool.h> // boolean
     #include <time.h> // time_t
     #include <termios.h> // termios
+    #include <SFML/Graphics.h> // CSFML types
 
     //----------------------------------------------------------------//
     /* DEFINE */
@@ -39,6 +40,12 @@
     #define MAX_INPUT_STR 2048
     #define VEOF 4
     #define VSIGINT 3
+
+    /* terminal */
+    #define MAX_LINES 30
+    #define MAX_LINE_LENGTH 90
+    #define MAX_LINE_SIZE (MAX_LINE_LENGTH * 8)
+    #define FONT "/usr/share/fonts/liberation-mono/LiberationMono-Regular.ttf"
 
     //----------------------------------------------------------------//
     /* MACRO */
@@ -88,6 +95,25 @@ typedef enum builtin_func_e {
     SILENT
 } builtin_func_t;
 
+/* terminal */
+typedef struct terminal_buffer_s {
+    /* window */
+    sfRenderWindow *window;
+    sfFont *font;
+    sfClock *cursor_clock;
+
+    /* var */
+    char current_line[MAX_LINE_LENGTH + 1];
+    int current_pos;
+
+    /* affichage */
+    char lines[MAX_LINES][MAX_LINE_LENGTH + 1];
+    int apartenance[MAX_LINES];
+    int last_apartenance;
+    int line_count;
+    int actual_ligne;
+} terminal_buffer_t;
+
 /* data */
 typedef struct main_data_s {
     /* redirect_var */
@@ -97,12 +123,15 @@ typedef struct main_data_s {
     int stdout_save;
 
     /* global_variable */
+    bool pty;
     bool silent;
     bool out;
     bool input_redirect;
 
+    /* terminal */
+    terminal_buffer_t *terminal;
+
     /* input_var */
-    bool pty;
     bool builtin;
     bool binary;
     builtin_func_t builtin_val;
@@ -153,13 +182,19 @@ int get_input(main_data_t *data); // Error: KO
 int add_history(main_data_t *data, hashtable_t *env, char *input); // Error: KO
 int do_input(main_data_t *data); // Error: KO
 
+/* terminal */ // Error: KO
+int display_pty(main_data_t *data); // Error: KO
+int pty_input_char(terminal_buffer_t *terminal, char **str, char c, bool exe);
+
 /* input_handling */ // Error: KO
+int input_handler(main_data_t *data); // Error: ???
+int pty_input_handler(main_data_t *data); // Error: KO
 int inputs_parser(main_data_t *data); // Error: KO
 int parser(main_data_t *data, array_t *array, char **input, int *i);
 int cmd_parser(main_data_t *data, array_t *array, char *input, int i);
 int check_syntax(main_data_t *data); // Error: KO
 int get_input_type(main_data_t *data, array_t *input); // Error: KO
-int replace_var(main_data_t *data);
+int replace_var(main_data_t *data); // Error: KO
 
 /* redirection */ // Error: KO
 int set_redirection(main_data_t *data, array_t *input, array_t *inputs, int i);
@@ -186,6 +221,7 @@ int init_global(main_data_t *data); // Error: KO
 int init_prompt(main_data_t *data); // Error: KO
 int init_env(main_data_t *data); // Error: KO
 int init_bonus(main_data_t *data); // Error: KO
+int init_term(main_data_t *data); // Error: KO
 
 /* signal */
 void handle_sigsegv(int sig); // Error: None
@@ -236,9 +272,6 @@ int free_input(void *input); // Error: KO
 
 /* autocompletion */
 void suggest(char **prefix, int pos, main_data_t *data);
-
-/* input */
-int input_handler(main_data_t *data);
 
 /* signals */
 size_t sigint(size_t write, size_t value);

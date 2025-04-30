@@ -12,6 +12,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <SFML/Graphics.h>
 
 static void enable_raw_mode(main_data_t *data, struct termios *original)
 {
@@ -63,8 +64,8 @@ int minishell(main_data_t *data)
     if (init_data(data) == KO)
         return err_custom("Data initialisation error", FATAL_ERR, ERR_INFO);
     set_signal();
-    while (!data->out && !(data->input_redirect
-        && data->return_value != OK)) {
+    while ((!data->pty || sfRenderWindow_isOpen(data->terminal->window))
+        && !data->out && !(data->input_redirect && data->return_value != OK)) {
         data->err_sys = false;
         if (get_input(data) == KO)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);

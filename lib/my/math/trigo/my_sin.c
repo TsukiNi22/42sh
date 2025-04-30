@@ -13,7 +13,7 @@ float my_sin(float x)
 {
     float sum = 1;
 
-    ABS(x);
+    x = ABS(x);
     if (x < 0)
         return err_prog(OVERFLOW, KO, ERR_INFO);
     for (; x > PI; x -= PI);

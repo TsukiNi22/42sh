@@ -25,7 +25,7 @@
     #define QUIT(condition, literal) if (condition) return literal
 
     /* math */
-    #define ABS(x) x = ((x) * (1 - 2 * (x < 0 || x == -0)))
+    #define ABS(x) ((x) * (1 - 2 * (x < 0 || x == -0)))
 
     /* string */
     #define GET_BOOL_STR(c) ((c) ? "true" : "false")
