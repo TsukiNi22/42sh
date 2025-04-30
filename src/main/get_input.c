@@ -7,24 +7,16 @@
 
 #include "define.h"
 #include "write.h"
-#include "my_string.h"
 #include "minishell.h"
 #include "error.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 
-int get_input(main_data_t *data)
+size_t choose_input(main_data_t *data)
 {
     int res = 0;
 
-    if (!data)
-        return err_prog(PTR_ERR, KO, ERR_INFO);
-    free(data->input);
-    if (data->inputs && delete_array(&(data->inputs), &free_input) == KO)
-        return err_prog(UNDEF_ERR, KO, ERR_INFO);
-    if (!data->input_redirect && set_prompt(data) == KO)
-        return err_prog(UNDEF_ERR, KO, ERR_INFO);
     if (data->input_redirect && getline(&(data->input), (size_t *){0}, stdin) == KO)
         data->out = true;
     if (!data->input_redirect) {
@@ -37,6 +29,20 @@ int get_input(main_data_t *data)
             my_putstr(STDOUT, "exit\n");
         return OK;
     }
+    return KO;
+}
+
+int get_input(main_data_t *data)
+{
+    if (!data)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    free(data->input);
+    if (data->inputs && delete_array(&(data->inputs), &free_input) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    if (!data->input_redirect && set_prompt(data) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    if (choose_input(data) == OK)
+        return OK;
     if (reset_ouput(1) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     return add_history(data, data->env, data->input);
