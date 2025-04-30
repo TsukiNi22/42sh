@@ -23,7 +23,7 @@ int get_input(main_data_t *data)
     free(data->input);
     if (data->inputs && delete_array(&(data->inputs), &free_input) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
-    if (!data->input_redirect && set_prompt(data) == KO)
+    if (!data->pty && !data->input_redirect && set_prompt(data) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     res = input_handler(data);
     printf("\n");
@@ -33,7 +33,7 @@ int get_input(main_data_t *data)
             my_putstr(STDOUT, "exit\n");
         return OK;
     }
-    if (reset_ouput(1) == KO)
+    if (!data->pty && reset_ouput(1) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     return add_history(data, data->env, data->input);
 }
