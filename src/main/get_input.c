@@ -15,11 +15,13 @@
 
 size_t choose_input(main_data_t *data)
 {
-    int res = 0;
+    int res = OK;
 
-    if (data->input_redirect &&
-        getline(&(data->input), (size_t *){0}, stdin) == KO)
-        data->out = true;
+    if (data->input_redirect) {
+        res = getline(&(data->input), &(size_t){0}, stdin);
+        if (res != OK)
+            data->input[res - 1] = '\0';
+    }
     if (!data->input_redirect) {
         res = input_handler(data);
         printf("\n");
@@ -28,7 +30,6 @@ size_t choose_input(main_data_t *data)
         data->out = true;
         if (!data->input_redirect)
             my_putstr(STDOUT, "exit\n");
-        return OK;
     }
     return KO;
 }
@@ -43,6 +44,8 @@ int get_input(main_data_t *data)
     if (!data->input_redirect && set_prompt(data) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     if (choose_input(data) == OK)
+        return OK;
+    if (data->out)
         return OK;
     if (reset_ouput(1) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
