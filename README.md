@@ -22,74 +22,76 @@
     <br> 
 </p>
 
-## 📝 Table of Contents
-
-- [About](#about)
-- [Getting Started](#getting_started)
-- [Deployment](#deployment)
-- [Usage](#usage)
-- [Built Using](#built_using)
-- [Contributing](../CONTRIBUTING.md)
-- [Authors](#authors)
-- [Acknowledgments](#acknowledgement)
-
 [![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=700&size=22&pause=1000&color=F7077E&vCenter=true&width=435&height=30&lines=🧐About)](https://git.io/typing-svg)
+---
 
-Write about 1-2 paragraphs describing the purpose of your project.
+42sh is a comprehensive terminal and shell project inspired by tcsh but enhanced with modern features. This implementation, nicknamed "OH MY BANANA!", combines a colorful terminal interface with powerful shell functionality including intelligent autocompletion, command history navigation, robust signal handling, and advanced input/output redirection. The project focuses on creating an intuitive user experience with features like text cursor movement, special character handling, and clear error messaging, all while maintaining the reliability of traditional shells but with a visually appealing and productivity-enhancing interface. 
 
-[![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=700&size=22&pause=1000&color=F7077E&vCenter=true&width=435&height=30&lines=🏁Getting_started)](https://git.io/typing-svg)
+[![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=700&size=22&pause=1000&color=F7077E&vCenter=true&width=435&height=30&lines=🏁Installing)](https://git.io/typing-svg)
+---
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See [deployment](#deployment) for notes on how to deploy the project on a live system.
+To execute the program you just have to follow the instuctions bellow:
+
+```bash
+git clone git@github.com:TsukiNi22/42sh.git
+``` 
+
+```bash
+cd 42sh
+```
+
+```bash
+make
+```
+
+```bash
+./42sh
+```
+
+🚩If you need help you have the --help or -h or the help command into the shell like that:
+
+```bash
+./42sh --help
+```
+
+```bash
+./42sh -h
+```
 
 [![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=700&size=22&pause=1000&color=F7077E&vCenter=true&width=435&height=30&lines=Prerequisite)](https://git.io/typing-svg)
+---
 
-What things you need to install the software and how to install them.
-
-```
-Give examples
-```
-
-[![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=700&size=22&pause=1000&color=F7077E&vCenter=true&width=435&height=30&lines=Installing)](https://git.io/typing-svg)
-
-A step by step series of examples that tell you how to get a development env running.
-
-Say what the step will be
-
-```
-Give the example
-```
-
-And repeat
-
-```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo.
+    - You just have to be on linux (and preferably on archlinux😎)
 
 [![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=700&size=22&pause=1000&color=F7077E&vCenter=true&width=435&height=30&lines=🎈Usage)](https://git.io/typing-svg)
+---
 
-Add notes about how to use the system.
+You can do all you want to do like a shell, but there is autocompletion, more colors and new commands for the environment like
 
-[![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=700&size=22&pause=1000&color=F7077E&vCenter=true&width=435&height=30&lines=🚀Deployment)](https://git.io/typing-svg)
+    - unsetenv var_name1 [var_name2 ...]
+    - setenv [var_name | var_name var_value]
+    - color [r_value | r_value g_value | r_value g_value b_value]
+    - alias [alias_name | alias_name alias_value]
+    - unalias alias_name1 [alias_name2 ...]
+    - source [-c | --create]
+    - history [number_to_diplay]
+    - .SILENT [true | false]
 
-Add additional notes about how to deploy this on a live system.
 
 [![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=700&size=22&pause=1000&color=F7077E&vCenter=true&width=435&height=30&lines=⛏️built_using)](https://git.io/typing-svg)
+---
 
-- [MongoDB](https://www.mongodb.com/) - Database
-- [Express](https://expressjs.com/) - Server Framework
-- [VueJs](https://vuejs.org/) - Web Framework
-- [NodeJs](https://nodejs.org/en/) - Server Environment
+- [C](https://en.wikipedia.org/wiki/C_(programming_language)) - Programming Language  
+- [Makefile](https://en.wikipedia.org/wiki/Make_(software)) - Build Automation Tool  
+- [Shell](https://en.wikipedia.org/wiki/Shell_(computing)) - Command-Line Interface  
+
 
 [![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=700&size=22&pause=1000&color=F7077E&vCenter=true&width=435&height=30&lines=✍️Authors)](https://git.io/typing-svg)
+---
 
-- [@kylelobo](https://github.com/kylelobo) - Idea & Initial work
-
-See also the list of [contributors](https://github.com/kylelobo/The-Documentation-Compendium/contributors) who participated in this project.
-
-[![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=700&size=22&pause=1000&color=F7077E&vCenter=true&width=435&height=30&lines=🎉Acknowledgements)](https://git.io/typing-svg)
-
-- Hat tip to anyone whose code was used
-- Inspiration
-- References
+- [@Tsukini22](https://github.com/Tsukini22)
+- [@Alexy33](https://github.com/Alexy33)
+- [@YetAnotherMechanicusEnjoyer](https://github.com/YetAnotherMechanicusEnjoyer)
+- [@Heizmei](https://github.com/Heizmei)
+- [@Thomas-B22](https://github.com/Thomas-B22)
+- [@MathieuCAZAYUS](https://github.com/MathieuCAZAYUS)
