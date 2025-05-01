@@ -83,7 +83,7 @@ You can do all you want to do like a shell, but there is autocompletion, more co
     - and so many others...
 
 
-[![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=700&size=22&pause=1000&color=F7077E&vCenter=true&width=435&height=30&lines=⛏️built_using)](https://git.io/typing-svg)
+[![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=700&size=22&pause=1000&color=F7077E&vCenter=true&width=435&height=30&lines=⛏️Built_using)](https://git.io/typing-svg)
 ---
 
 - [C](https://en.wikipedia.org/wiki/C_(programming_language)) - Programming Language  
