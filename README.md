@@ -25,7 +25,11 @@
 [![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=700&size=22&pause=1000&color=F7077E&vCenter=true&width=435&height=30&lines=🧐About)](https://git.io/typing-svg)
 ---
 
-42sh is a comprehensive terminal and shell project inspired by tcsh but enhanced with modern features. This implementation, nicknamed "OH MY BANANA!", combines a colorful terminal interface with powerful shell functionality including intelligent autocompletion, command history navigation, robust signal handling, and advanced input/output redirection. The project focuses on creating an intuitive user experience with features like text cursor movement, special character handling, and clear error messaging, all while maintaining the reliability of traditional shells but with a visually appealing and productivity-enhancing interface. 
+42sh is a comprehensive terminal and shell project inspired by tcsh but enhanced with modern features. This implementation, nicknamed "OH MY BANANA!".
+
+Combines a colorful terminal interface with powerful shell functionality including intelligent autocompletion, command history navigation, robust signal handling, and advanced input/output redirection. 
+
+The project focuses on creating an intuitive user experience with features like text cursor movement, special character handling, and clear error messaging, all while maintaining the reliability of traditional shells but with a visually appealing and productivity-enhancing interface. 
 
 [![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=700&size=22&pause=1000&color=F7077E&vCenter=true&width=435&height=30&lines=🏁Installing)](https://git.io/typing-svg)
 ---
@@ -76,6 +80,7 @@ You can do all you want to do like a shell, but there is autocompletion, more co
     - source [-c | --create]
     - history [number_to_diplay]
     - .SILENT [true | false]
+    - and so many others...
 
 
 [![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=700&size=22&pause=1000&color=F7077E&vCenter=true&width=435&height=30&lines=⛏️built_using)](https://git.io/typing-svg)
