@@ -26,14 +26,13 @@ int pty_input_char_exec(terminal_buffer_t *terminal, char c)
         }
         terminal->apartenance[terminal->line_count] = -1;
         strcpy(terminal->lines[terminal->line_count++], terminal->current_line);
-        terminal->current_pos = 0;
         memset(terminal->current_line, 0, sizeof(terminal->current_line));
+        terminal->current_pos = 0;
         terminal->actual_ligne = terminal->line_count;
     } else {
         if (get_size(terminal->current_line) < MAX_LINE_SIZE - 8) {
-            if (!((c >= 32 && c <= 126) || (c >= 7 && c <= 13))) {
+            if (!((c >= 32 && c <= 126) || (c >= 7 && c <= 13)))
                 c = -80;
-            }
             terminal->current_line[terminal->current_pos++] = c;
             terminal->current_line[terminal->current_pos] = '\0';
         } else {
@@ -46,8 +45,8 @@ int pty_input_char_exec(terminal_buffer_t *terminal, char c)
             }
             terminal->apartenance[terminal->line_count] = -1;
             strcpy(terminal->lines[terminal->line_count++], terminal->current_line);
-            terminal->current_pos = 0;
             memset(terminal->current_line, 0, sizeof(terminal->current_line));
+            terminal->current_pos = 0;
         }
     }
     return OK;

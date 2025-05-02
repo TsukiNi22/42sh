@@ -22,7 +22,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-static int get_size(hashtable_t *env, char *key)
+static int get_size_hash_val(hashtable_t *env, char *key)
 {
     char *value = NULL;
     int size = 0;
@@ -59,7 +59,7 @@ static char **materialise_env(main_data_t *data)
         return err_prog_n(MALLOC_ERR, ERR_INFO);
     env[data->env->keys_nbr] = NULL;
     for (int i = 0; keys[i]; i++) {
-        if (my_malloc_c(&env[i], get_size(data->env, keys[i]) + 1) == KO
+        if (my_malloc_c(&env[i], get_size_hash_val(data->env, keys[i]) + 1) < 0
             || !my_strcat(env[i], keys[i]) || !my_strcat(env[i], "=")
             || !my_strcat(env[i], ht_search(data->env, keys[i])))
             return err_prog_n(UNDEF_ERR, ERR_INFO);
