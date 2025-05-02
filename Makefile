@@ -96,7 +96,8 @@ BUILTIN := 	builtin/exit.c \
 			builtin/silent.c
 
 PTY := 		bonus/pty/display_pty.c \
-			bonus/pty/pty_handler.c
+			bonus/pty/pty_handler.c \
+			bonus/pty/pty_exec_handling.c
 
 FILES := $(INIT) $(SIGNAL) $(GLOBAL) $(MAIN) $(UPDATE)
 FILES += $(PARSER) $(REDIRECT) $(SYNTAX) $(BUILTIN)

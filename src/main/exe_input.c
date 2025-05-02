@@ -12,6 +12,7 @@
 #include "hashtable.h"
 #include "minishell.h"
 #include "error.h"
+#include <pty.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -117,7 +118,7 @@ static void clear_memory_error_exec(main_data_t *data,
     free_array(env);
     free_array(cmd);
     free_data(data);
-    exit(1 + 125 * (errno == ENOEXEC));
+    _exit(1 + 125 * (errno == ENOEXEC));
 }
 
 static void child(main_data_t *data, array_t *input)
@@ -127,12 +128,12 @@ static void child(main_data_t *data, array_t *input)
     char *cmd_path = NULL;
 
     if (!data || !input || set_pipe_child(data) == KO)
-        exit(EPITECH_ERR);
+        _exit(EPITECH_ERR);
     env = materialise_env(data);
     cmd = materialise_cmd(input);
     cmd_path = get_cmd_path(data->env_path, input, data->binary);
     if (!env || !cmd || !cmd_path)
-        exit(EPITECH_ERR);
+        _exit(EPITECH_ERR);
     execve(cmd_path, cmd, env);
     if (errno == ENOEXEC)
         err_system(data, KO, input->data[*((int *) input->data[0]) + 1],
@@ -152,6 +153,8 @@ static int handle_return(main_data_t *data, pid_t pid, array_t *input, int i)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     if (set_pipe_parent(data, input, i) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    if (data->pty && pty_exec_handling(data, pid) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
     waitpid(pid, &status, WUNTRACED);
     if (WIFSIGNALED(status)) {
         signal = WTERMSIG(status);
@@ -167,6 +170,7 @@ static int handle_return(main_data_t *data, pid_t pid, array_t *input, int i)
 
 int exe_cmd(main_data_t *data, array_t *cmd, array_t *input, int i)
 {
+    struct winsize ws = {30, 90, 0, 0};
     pid_t pid = OK;
 
     if (!data || !cmd || !input)
@@ -176,7 +180,10 @@ int exe_cmd(main_data_t *data, array_t *cmd, array_t *input, int i)
     if (data->err_sys)
         return OK;
     if (!data->builtin) {
-        pid = fork();
+        if (data->pty)
+            pid = forkpty(&data->master_fd, NULL, NULL, &ws);
+        else
+            pid = fork();
         if (pid == KO)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
         if (pid == OK)

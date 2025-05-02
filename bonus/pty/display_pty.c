@@ -13,6 +13,8 @@ int get_size(char *line)
 {
     int size = 0;
 
+    if (!line)
+        return 0;
     for (int i = 0; line[i]; i++) {
         if (line[i] == '\t')
             size += 8 * 4;

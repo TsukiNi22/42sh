@@ -274,7 +274,7 @@ char *cat_str(char *first, char *second)
 }
 
 int main()
-{    
+{
     // SFML setup
     sfRenderWindow* window;
     sfVideoMode mode = {800, 600, 32};

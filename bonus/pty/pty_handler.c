@@ -15,19 +15,6 @@
 #include <stdbool.h>
 #include <SFML/Graphics.h>
 
-static int get_size(char *line)
-{
-    int size = 0;
-
-    for (int i = 0; line[i]; i++) {
-        if (line[i] == '\t')
-            size += 8 * 4;
-        else
-            size += 8;
-    }
-    return size;
-}
-
 static char *cat_str(char *first, char *second)
 {
     char *new_str = NULL;
@@ -50,11 +37,11 @@ static char *cat_str(char *first, char *second)
     return new_str;
 }
 
-static int back_line(terminal_buffer_t *terminal, char **str, bool exe)
+static int back_line(terminal_buffer_t *terminal, char **str)
 {
     char *cmd = NULL;
 
-    if (!terminal)
+    if (!terminal || !str)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     terminal->current_line[terminal->current_pos] = '\0';
     if (terminal->line_count >= MAX_LINES) {
@@ -68,13 +55,11 @@ static int back_line(terminal_buffer_t *terminal, char **str, bool exe)
     terminal->current_pos = 0;
     memset(terminal->current_line, 0, sizeof(terminal->current_line));
     terminal->actual_ligne = terminal->line_count;
-    if (exe) {
-        for (int i = 0; exe && i < MAX_LINES; i++) {
-            if (terminal->apartenance[i] == terminal->last_apartenance)
-                cmd = cat_str(cmd, terminal->lines[i]);
-        }
-        *str = cmd;
+    for (int i = 0; i < MAX_LINES; i++) {
+        if (terminal->apartenance[i] == terminal->last_apartenance)
+            cmd = cat_str(cmd, terminal->lines[i]);
     }
+    *str = cmd;
     return OK;
 }
 
@@ -119,16 +104,16 @@ static int add_char(terminal_buffer_t *terminal, char c)
     return OK;
 }
 
-int pty_input_char(terminal_buffer_t *terminal, char **str, char c, bool exe)
+int pty_input_char(terminal_buffer_t *terminal, char **str, char c)
 {
     if (!terminal || !str)
         return err_prog(PTR_ERR, KO, ERR_INFO);
-    if (c == 13) { // \n
-        back_line(terminal, str, exe);
+    if (c == 13) {
+        back_line(terminal, str);
         return 2;
-    } else if (c == 127 || c == 8) { // Backspace
+    } else if (c == 127 || c == 8)
         backspace(terminal);
-    } else { // Caractères imprimables + tab
+    else {
         if (get_size(terminal->current_line) >= MAX_LINE_SIZE - 8 && terminal->line_count - terminal->actual_ligne >= MAX_LINES)
             return OK;
         add_char(terminal, c);
@@ -151,7 +136,7 @@ int pty_input_handler(main_data_t *data)
                 sfRenderWindow_close(data->terminal->window);
             if (event.type == sfEvtTextEntered) {
                 c = event.text.unicode;
-                if (pty_input_char(data->terminal, &data->input, c, true) == 2)
+                if (pty_input_char(data->terminal, &data->input, c) == 2)
                     return OK;
             }
         }

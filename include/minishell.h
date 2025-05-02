@@ -130,6 +130,7 @@ typedef struct main_data_s {
 
     /* terminal */
     terminal_buffer_t *terminal;
+    int master_fd;
 
     /* input_var */
     bool builtin;
@@ -184,7 +185,9 @@ int do_input(main_data_t *data); // Error: KO
 
 /* terminal */ // Error: KO
 int display_pty(main_data_t *data); // Error: KO
-int pty_input_char(terminal_buffer_t *terminal, char **str, char c, bool exe);
+int pty_input_char(terminal_buffer_t *terminal, char **str, char c);
+int pty_exec_handling(main_data_t *data, pid_t pid); // Error: KO
+int get_size(char *line); // Error: 0
 
 /* input_handling */ // Error: KO
 int input_handler(main_data_t *data); // Error: ???
