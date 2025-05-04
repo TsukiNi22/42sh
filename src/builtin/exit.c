@@ -25,5 +25,7 @@ int builtin_exit(main_data_t *data, array_t *input, int start)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     if (my_putstr(STDOUT, "exit\n") == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    if (data->pty)
+        _exit(n);
     exit(n);
 }
