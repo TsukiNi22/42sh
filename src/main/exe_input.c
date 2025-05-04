@@ -121,7 +121,7 @@ static void clear_memory_error_exec(main_data_t *data,
     _exit(1 + 125 * (errno == ENOEXEC));
 }
 
-static void child(main_data_t *data, array_t *input)
+static int child(main_data_t *data, array_t *input)
 {
     char **env = NULL;
     char **cmd = NULL;
@@ -142,6 +142,7 @@ static void child(main_data_t *data, array_t *input)
         err_system(data, KO, input->data[*((int *) input->data[0]) + 1],
         strerror(errno));
     clear_memory_error_exec(data, env, cmd, cmd_path);
+    return KO;
 }
 
 static int handle_return(main_data_t *data, pid_t pid, array_t *input, int i)
@@ -170,7 +171,6 @@ static int handle_return(main_data_t *data, pid_t pid, array_t *input, int i)
 
 int exe_cmd(main_data_t *data, array_t *cmd, array_t *input, int i)
 {
-    struct winsize ws = {30, 90, 0, 0};
     pid_t pid = OK;
 
     if (!data || !cmd || !input)
@@ -181,14 +181,11 @@ int exe_cmd(main_data_t *data, array_t *cmd, array_t *input, int i)
         return OK;
     if (!data->builtin) {
         if (data->pty)
-            pid = forkpty(&data->master_fd, NULL, NULL, &ws);
+            pid = forkpty(&data->master_fd, NULL, NULL, NULL);
         else
             pid = fork();
-        if (pid == KO)
-            return err_prog(UNDEF_ERR, KO, ERR_INFO);
-        if (pid == OK)
-            child(data, cmd);
-        if (handle_return(data, pid, input, i) == KO)
+        if (pid == KO || (pid == OK && child(data, cmd) == KO)
+            || (pid != OK && handle_return(data, pid, input, i) == KO))
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
     } else if (builtin_func[data->builtin_val](data,
         cmd, *((int *) cmd->data[0]) + 1) == KO)
