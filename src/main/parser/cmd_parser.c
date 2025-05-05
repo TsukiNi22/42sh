@@ -53,18 +53,17 @@ static int set_cmd(array_t *array, char **ptr, char *input, bool spe)
     if (!array || !ptr || !input)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     var[0] = input - *ptr;
-    if (var[0] > 0) {
-        if (my_malloc_c(&str, var[0] + 1) == KO)
-            return err_prog(UNDEF_ERR, KO, ERR_INFO);
-        for (int i = 0; i < var[0]; i++) {
-            spe = ((*ptr)[i] != '\'' && (*ptr)[i] != '\"'
-            && (*ptr)[i] != '(' && (*ptr)[i] != ')');
-            str[i - var[1]] = (*ptr)[i] * spe;
-            var[1] += !spe;
-        }
-        if (add_array(array, str) == KO)
-            return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    if (var[0] > 0 && my_malloc_c(&str, var[0] + 1) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    for (int i = 0; i < var[0]; i++) {
+        spe = (i > 0 && (*ptr)[i - 1] == '\\')
+        || ((*ptr)[i] != '\\' && (*ptr)[i] != '\'' && (*ptr)[i] != '\"'
+        && (*ptr)[i] != '(' && (*ptr)[i] != ')');
+        str[i - var[1]] = (*ptr)[i] * spe;
+        var[1] += !spe;
     }
+    if (var[0] > 0 && add_array(array, str) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
     *ptr = input + 1;
     return OK;
 }
