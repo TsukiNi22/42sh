@@ -38,28 +38,24 @@ To execute the program you just have to follow the instuctions bellow:
 
 ```bash
 git clone git@github.com:TsukiNi22/42sh.git
-``` 
-
-```bash
 cd 42sh
+make sys_cmd
 ```
 
 ```bash
-make
+42sh
 ```
 
+🚩<strong>If you need <u>HELP</u> you have the command</strong>:
+
 ```bash
-./42sh
+help
 ```
 
-🚩If you need help you have the --help or -h or the help command into the shell like that:
+🥵 <strong>And there is a <u>termnial</u> associated with the shell and you can run it like that:</strong>
 
 ```bash
-./42sh --help
-```
-
-```bash
-./42sh -h
+42sh -t
 ```
 
 [![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=700&size=22&pause=1000&color=F7077E&vCenter=true&width=435&height=30&lines=Prerequisite)](https://git.io/typing-svg)
