@@ -17,8 +17,12 @@
 
 static int is_a_pty(main_data_t *data)
 {
+    char const *term = getenv("TERM");
+
     if (!data)
         return err_prog(PTR_ERR, KO, ERR_INFO);
+    if (!data->pty && !term)
+        data->pty = true;
     if (!data->pty)
         return OK;
     if (ht_insert(data->env, my_strdup("TERM"),

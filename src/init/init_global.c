@@ -19,7 +19,7 @@ int init_global(main_data_t *data)
     data->binary = false;
     data->builtin = false;
     data->builtin_val = NONE;
-    data->input_redirect = !isatty(STDIN_FILENO);
+    data->input_redirect = (!isatty(STDIN_FILENO) && !data->pty);
     data->err_sys = false;
     data->input = NULL;
     data->inputs = NULL;
