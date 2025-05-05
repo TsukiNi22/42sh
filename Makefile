@@ -41,16 +41,16 @@ SIGNAL :=	handle_signal/sigsegv.c \
 			handle_signal/sigtstp.c \
 			handle_signal/sigquit.c
 
-GLOBAL :=	autocompletion.c \
-			main.c \
+GLOBAL :=	main.c \
 			const.c \
 			minishell.c \
 			free_data.c \
-			input.c	\
 			arrows.c	\
 
 MAIN := 	main/prompt.c \
 			main/get_input.c \
+			main/autocompletion.c \
+			main/input.c	\
 			main/history.c \
 			main/check_syntax.c \
 			main/get_input_type.c \
