@@ -24,7 +24,8 @@ static int pty_color(main_data_t *data)
     if (pid == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     if (pid == OK) {
-        if (my_printf("Color set to: %d, %d, %d\n%CThis is a color test :)\n%R",
+        if (my_printf("Color set to: %d, %d, %d\n%C"
+            "This is a color test :)\n%R",
             data->r, data->g, data->b, data->r, data->g, data->b) == KO)
             _exit(KO);
         _exit(OK);

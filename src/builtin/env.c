@@ -18,6 +18,7 @@ static int pty_env(main_data_t *data, char **keys, char *value)
 {
     pid_t pid = OK;
     int status = 0;
+    int res = OK;
 
     if (!data || !keys)
         return err_prog(PTR_ERR, KO, ERR_INFO);
@@ -27,10 +28,9 @@ static int pty_env(main_data_t *data, char **keys, char *value)
     if (pid == OK) {
         for (int i = 0; keys[i]; i++) {
             value = ht_search(data->env, keys[i]);
-            if (!value || my_printf("%s=%s\n", keys[i], value) == KO)
-                _exit(KO);
+            res += KO * (!value || my_printf("%s=%s\n", keys[i], value) == KO);
         }
-        _exit(OK);
+        _exit(KO * (res != OK));
     }
     if (pty_exec_handling(data, pid) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
