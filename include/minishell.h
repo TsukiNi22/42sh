@@ -23,14 +23,14 @@
     /* DEFINE */
 
     /* myshrc */
-    #define MYSHRC_FILE ".myshrc"
+    #define MYSHRC_FILE ".bananarc"
 
     /* prompt */
     #define GIT_FILE ".git/HEAD"
 
     /* history */
     #define HISTORY_SIZE 50000
-    #define HISTORY_FILE ".mysh_history"
+    #define HISTORY_FILE ".banana_history"
 
     /* builtin */
     #define BUILTIN_MIN EXIT
