@@ -10,7 +10,7 @@
 [![Status](https://img.shields.io/badge/status-active-success.svg)]()
 [![GitHub Issues](https://img.shields.io/github/issues/TsukiNi22/42sh.svg)](https://github.com/TsukiNi22/42sh/issues)
 [![GitHub Pull Requests](https://img.shields.io/github/issues-pr/TsukiNi22/42sh.svg)](https://github.com/TsukiNi22/42sh/pulls)
-[![License](https://img.shields.io/badge/license-XARTANIA-blue.svg)](/LICENSE)
+[![License](https://img.shields.io/badge/license-XARTANIA-blue.svg)](LICENSE)
 
 </div>
 
