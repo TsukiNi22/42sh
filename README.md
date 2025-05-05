@@ -66,17 +66,23 @@ help
 [![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=700&size=22&pause=1000&color=F7077E&vCenter=true&width=435&height=30&lines=🎈Usage)](https://git.io/typing-svg)
 ---
 
-You can do all you want to do like a shell, but there is autocompletion, more colors and new commands for the environment like
+Builtin:
+        -exit [exit_value]
+        -cd [path]
+        -env
+        -setenv [var_name | var_name var_value]
+        -unsetenv var_name1 [var_name2 ...]     (doesn't support the '*' wildcard)
 
-    - unsetenv var_name1 [var_name2 ...]
-    - setenv [var_name | var_name var_value]
-    - color [r_value | r_value g_value | r_value g_value b_value]
-    - alias [alias_name | alias_name alias_value]
-    - unalias alias_name1 [alias_name2 ...]
-    - source [-c | --create]
-    - history [number_to_diplay]
-    - .SILENT [true | false]
-    - and so many others...
+Builtin Bonus:
+        -bonus [true | false]
+        -color [r_value | r_value g_value | r_value g_value b_value]
+        -help
+        -alias [alias_name | alias_name alias_value]
+        -unalias alias_name1 [alias_name2 ...]
+        -history [number_to_diplay]
+        -source [-c | --create]
+        -rehash
+        -.SILENT [true | false]
 
 
 [![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=700&size=22&pause=1000&color=F7077E&vCenter=true&width=435&height=30&lines=⛏️Built_using)](https://git.io/typing-svg)
