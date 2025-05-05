@@ -15,12 +15,24 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+static int is_a_pty(main_data_t *data)
+{
+    if (!data)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    if (!data->pty)
+        return OK;
+    if (ht_insert(data->env, my_strdup("TERM"),
+        my_strdup("minimal"), &free_hash_data_str) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    return OK;
+}
+
 static int set_env(main_data_t *data, char const *env[])
 {
     char *name = NULL;
     char *val = NULL;
 
-    if (!data)
+    if (!data || !env)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     data->env = new_hashtable(&hash, DEFAULT_HASH_SIZE);
     if (!data->env)
@@ -36,7 +48,7 @@ static int set_env(main_data_t *data, char const *env[])
         if (ht_insert(data->env, name, val, &free_hash_data_str) == KO)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
     }
-    return OK;
+    return is_a_pty(data);
 }
 
 int main(int const argc, char const *argv[], char const *env[])
