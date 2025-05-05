@@ -40,6 +40,8 @@ char const *builtin_array_name[] = {
     "cd",
     "setenv",
     "unsetenv",
+    "set",
+    "unset",
     "env",
     "color",
     "help",
@@ -57,6 +59,8 @@ int (* const builtin_check_syntax[])(main_data_t *, array_t *, int) = {
     &check_syntax_cd,       // cd
     &check_syntax_setenv,   // setenv
     &check_syntax_unsetenv, // unsetenv
+    &check_syntax_set,      // set
+    &check_syntax_unset,    // unset
     &check_syntax_env,      // env
     &check_syntax_color,    // color
     &check_syntax_help,     // help
@@ -73,6 +77,8 @@ int (* const builtin_func[])(main_data_t *, array_t *, int) = {
     &builtin_cd,        // cd
     &builtin_setenv,    // setenv
     &builtin_unsetenv,  // unsetenv
+    &builtin_set,    // set
+    &builtin_unset,  // unset
     &builtin_env,       // env
     &builtin_color,     // color
     &builtin_help,      // help
