@@ -78,6 +78,11 @@ jobs:
         run: make clean
         if: always()
 
+      - name: Install CSFML
+        run: |
+          apt-get update
+          apt-get install -y libcsfml-dev
+
       - name: Check executables
         run: |
           for executable in $(echo $EXECUTABLES | tr ',' ' '); do
