@@ -61,6 +61,8 @@ char const *builtin_array_name[] = {
     "source",
     "rehash",
     "clear",
+    "which",
+    "where",
     ".SILENT",
     NULL
 };
@@ -81,6 +83,8 @@ int (* const builtin_check_syntax[])(main_data_t *, array_t *, int) = {
     &check_syntax_source,   // source
     &check_syntax_rehash,   // rehash
     &check_syntax_clear,    // clear
+    &check_syntax_which,    // which
+    &check_syntax_where,    // where
     &check_syntax_silent    // .SILENT
 };
 
@@ -100,5 +104,7 @@ int (* const builtin_func[])(main_data_t *, array_t *, int) = {
     &builtin_source,    // source
     &builtin_rehash,    // rehash
     &builtin_clear,     // clear
+    &builtin_which,     // which
+    &builtin_where,     // where
     &builtin_silent     // .SILENT
 };

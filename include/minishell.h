@@ -95,6 +95,8 @@ typedef enum builtin_func_e {
     SOURCE,
     REHASH,
     CLEAR,
+    WHICH,
+    WHERE,
     SILENT
 } builtin_func_t;
 
@@ -264,6 +266,8 @@ int check_syntax_history(main_data_t *data, array_t *input, int start);
 int check_syntax_source(main_data_t *data, array_t *input, int start);
 int check_syntax_rehash(main_data_t *data, array_t *input, int start);
 int check_syntax_clear(main_data_t *data, array_t *input, int start);
+int check_syntax_which(main_data_t *data, array_t *input, int start);
+int check_syntax_where(main_data_t *data, array_t *input, int start);
 int check_syntax_silent(main_data_t *data, array_t *input, int start);
 
 /* builtin_func */ // Error: KO
@@ -283,6 +287,8 @@ int builtin_history(main_data_t *data, array_t *input, int start);
 int builtin_source(main_data_t *data, array_t *input, int start);
 int builtin_rehash(main_data_t *data, array_t *input, int start);
 int builtin_clear(main_data_t *data, array_t *input, int start);
+int builtin_which(main_data_t *data, array_t *input, int start);
+int builtin_where(main_data_t *data, array_t *input, int start);
 int builtin_silent(main_data_t *data, array_t *input, int start);
 
 /* exit */
