@@ -60,6 +60,7 @@ char const *builtin_array_name[] = {
     "history",
     "source",
     "rehash",
+    "clear",
     ".SILENT",
     NULL
 };
@@ -79,6 +80,7 @@ int (* const builtin_check_syntax[])(main_data_t *, array_t *, int) = {
     &check_syntax_history,  // history
     &check_syntax_source,   // source
     &check_syntax_rehash,   // rehash
+    &check_syntax_clear,    // clear
     &check_syntax_silent    // .SILENT
 };
 
@@ -87,8 +89,8 @@ int (* const builtin_func[])(main_data_t *, array_t *, int) = {
     &builtin_cd,        // cd
     &builtin_setenv,    // setenv
     &builtin_unsetenv,  // unsetenv
-    &builtin_set,    // set
-    &builtin_unset,  // unset
+    &builtin_set,       // set
+    &builtin_unset,     // unset
     &builtin_env,       // env
     &builtin_color,     // color
     &builtin_help,      // help
@@ -97,5 +99,6 @@ int (* const builtin_func[])(main_data_t *, array_t *, int) = {
     &builtin_history,   // history
     &builtin_source,    // source
     &builtin_rehash,    // rehash
+    &builtin_clear,     // clear
     &builtin_silent     // .SILENT
 };
