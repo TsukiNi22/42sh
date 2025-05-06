@@ -84,6 +84,8 @@ typedef enum builtin_func_e {
     CD,
     SETENV,
     UNSETENV,
+    SET,
+    UNSET,
     ENV,
     COLOR,
     HELP,
@@ -92,7 +94,7 @@ typedef enum builtin_func_e {
     HISTORY,
     SOURCE,
     REHASH,
-    SILENT
+    SILENT,
 } builtin_func_t;
 
 /* terminal */
@@ -139,6 +141,9 @@ typedef struct main_data_s {
 
     /* alias */
     hashtable_t *alias;
+
+    /* variable */
+    hashtable_t *var;
 
     /* path */
     char *last_path;
@@ -197,7 +202,8 @@ int parser(main_data_t *data, array_t *array, char **input, int *i);
 int cmd_parser(main_data_t *data, array_t *array, char *input, int i);
 int check_syntax(main_data_t *data); // Error: KO
 int get_input_type(main_data_t *data, array_t *input); // Error: KO
-int replace_var(main_data_t *data); // Error: KO
+int replace_alias(main_data_t *data, bool *done); // Error: KO
+int replace_var(main_data_t *data, bool *done); // Error: KO
 
 /* redirection */ // Error: KO
 int set_redirection(main_data_t *data, array_t *input, array_t *inputs, int i);
@@ -242,6 +248,8 @@ int check_syntax_exit(main_data_t *data, array_t *input, int start);
 int check_syntax_cd(main_data_t *data, array_t *input, int start);
 int check_syntax_setenv(main_data_t *data, array_t *input, int start);
 int check_syntax_unsetenv(main_data_t *data, array_t *input, int start);
+int check_syntax_set(main_data_t *data, array_t *input, int start);
+int check_syntax_unset(main_data_t *data, array_t *input, int start);
 int check_syntax_env(main_data_t *data, array_t *input, int start);
 int check_syntax_color(main_data_t *data, array_t *input, int start);
 int check_syntax_help(main_data_t *data, array_t *input, int start);
@@ -258,6 +266,8 @@ int builtin_exit(main_data_t *data, array_t *input, int start);
 int builtin_cd(main_data_t *data, array_t *input, int start);
 int builtin_setenv(main_data_t *data, array_t *input, int start);
 int builtin_unsetenv(main_data_t *data, array_t *input, int start);
+int builtin_set(main_data_t *data, array_t *input, int start);
+int builtin_unset(main_data_t *data, array_t *input, int start);
 int builtin_env(main_data_t *data, array_t *input, int start);
 int builtin_color(main_data_t *data, array_t *input, int start);
 int builtin_help(main_data_t *data, array_t *input, int start);

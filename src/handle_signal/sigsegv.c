@@ -13,6 +13,6 @@
 
 void handle_sigsegv(UNUSED int sig)
 {
-    my_putstr(STDERR, "mysh: Got killed will doing somthing.\n");
+    my_putstr(STDERR, "mysh: Got killed will doing something.\n");
     exit(EPITECH_ERR);
 }

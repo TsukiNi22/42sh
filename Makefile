@@ -62,7 +62,8 @@ UPDATE :=	update/sys_func_update.c
 PARSER := 	main/parser/inputs_parser.c \
 			main/parser/input_parser.c \
 			main/parser/cmd_parser.c \
-			main/parser/replace_var.c
+			main/parser/replace_var.c \
+			main/parser/replace_alias.c
 
 REDIRECT := main/redirection/set_redirection.c \
 			main/redirection/get_heredoc.c
@@ -79,7 +80,9 @@ SYNTAX := 	check_syntax/check_syntax_exit.c \
 			check_syntax/check_syntax_history.c \
 			check_syntax/check_syntax_source.c \
 			check_syntax/check_syntax_rehash.c \
-			check_syntax/check_syntax_silent.c
+			check_syntax/check_syntax_silent.c	\
+			check_syntax/check_syntax_set.c	\
+			check_syntax/check_syntax_unset.c
 
 BUILTIN := 	builtin/exit.c \
 			builtin/cd.c \
@@ -93,7 +96,9 @@ BUILTIN := 	builtin/exit.c \
 			builtin/history.c \
 			builtin/source.c \
 			builtin/rehash.c \
-			builtin/silent.c
+			builtin/silent.c	\
+			builtin/set.c	\
+			builtin/unset.c
 
 PTY := 		bonus/pty/display_pty.c \
 			bonus/pty/pty_handler.c \
