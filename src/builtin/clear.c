@@ -16,7 +16,8 @@ static int pty_clear(main_data_t *data)
 {
     if (!data)
         return err_prog(PTR_ERR, KO, ERR_INFO);
-    memset(data->terminal->lines, 0, sizeof(char) * (MAX_LINES - 1) * MAX_LINE_LENGTH);
+    memset(data->terminal->lines, 0,
+    sizeof(char) * (MAX_LINES - 1) * MAX_LINE_LENGTH);
     memset(data->terminal->apartenance, 0, sizeof(int) * (MAX_LINES - 1));
     data->terminal->last_apartenance = -1;
     data->terminal->line_count = 0;
