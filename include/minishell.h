@@ -139,6 +139,10 @@ typedef struct main_data_s {
     bool binary;
     builtin_func_t builtin_val;
 
+    /* source */
+    bool source_stoped;
+    int source_depth;
+
     /* alias */
     hashtable_t *alias;
 

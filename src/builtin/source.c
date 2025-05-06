@@ -34,7 +34,7 @@ static int exec_line(main_data_t *data, char *line)
     return OK;
 }
 
-static int exec_lines(main_data_t *data, char **lines)
+static int exec_lines(main_data_t *data, char **lines, char *path)
 {
     int j = 0;
 
@@ -47,11 +47,12 @@ static int exec_lines(main_data_t *data, char **lines)
         lines[i][j] = '\0';
         if (exec_line(data, my_strdup(lines[i])) == KO)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
-        if (data->err_sys && my_printf("%Oline %d: %C%s\n%R",
+        if (data->err_sys && !data->source_stoped
+            && my_printf("%Oline %d: %C%s\n%R",
             STDERR, i, 255, 0, 0, lines[i]) == KO)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
-        if (data->err_sys)
-            return err_system(data, OK, "source", "Syntax error in ~/.myshrc");
+        if (data->err_sys && !data->source_stoped)
+            return err_system(data, OK, path, "Syntax error");
     }
     return OK;
 }
@@ -74,14 +75,16 @@ static int create_file(char *path)
     return OK;
 }
 
-static int set_file(main_data_t *data, array_t *input, char **file, char *path)
+static int set_file(main_data_t *data, array_t *input, char **file,
+    char *path)
 {
-    if (!data || !input || !file)
+    if (!data || !input || !file || !path)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     if (!path) {
         data->return_value = 1;
         err_system(data, OK, "source", "Can't found the HOME "
         "environement variable");
+        data->source_depth = 0;
         return KO;
     }
     *file = get_file(path);
@@ -91,6 +94,7 @@ static int set_file(main_data_t *data, array_t *input, char **file, char *path)
         else
             err_system(data, OK, "source", "Create a file ~/.myshrc or "
             "use \'source -c\' if you want to use \'source\'");
+        data->source_depth = 0;
         return KO;
     }
     return OK;
@@ -106,19 +110,42 @@ static int set_file_arg(char **file, char *path)
     return OK;
 }
 
-int builtin_source(main_data_t *data, array_t *input, UNUSED int start)
+static int exe_file(main_data_t *data, char **lines,
+    array_t *input, int start)
 {
     array_t *inputs_save = NULL;
     char *input_save = NULL;
+    char *path = "~/.bananarc";
+
+    if (!data || !lines || !input)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    if (input->len - start == 2)
+        path = input->data[start + 1];
+    input_save = data->input;
+    inputs_save = data->inputs;
+    if (!lines || exec_lines(data, lines, path) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    data->input = input_save;
+    data->inputs = inputs_save;
+    free_array(lines);
+    data->source_depth = 0;
+    return OK;
+}
+
+int builtin_source(main_data_t *data, array_t *input, int start)
+{
     char **lines = NULL;
     char *file = NULL;
     bool c = false;
 
     if (!data || !input)
         return err_prog(PTR_ERR, KO, ERR_INFO);
-    c = (input->len - start == 1
-    || my_strcmp(input->data[start + 1], "-c") == 0
-    || my_strcmp(input->data[start + 1], "--create") == 0);
+    data->source_depth++;
+    data->source_stoped = (data->source_depth >= 10);
+    if (data->source_stoped)
+        return err_system(data, OK, "source", "Stoped due to a depth >= 10");
+    c = input->len - start == 1 || my_strcmp(input->data[start + 1], "-c") == 0
+    || my_strcmp(input->data[start + 1], "--create") == 0;
     if (c && set_file(data, input, &file,
         get_full_path(ht_search(data->env, "HOME"), MYSHRC_FILE)) == KO)
         return OK;
@@ -126,11 +153,5 @@ int builtin_source(main_data_t *data, array_t *input, UNUSED int start)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     lines = str_to_str_array(file, "\n", false);
     free(file);
-    input_save = data->input;
-    inputs_save = data->inputs;
-    if (!lines || exec_lines(data, lines) == KO)
-        return err_prog(UNDEF_ERR, KO, ERR_INFO);
-    data->input = input_save;
-    data->inputs = inputs_save;
-    return free_array(lines);
+    return exe_file(data, lines, input, start);
 }
