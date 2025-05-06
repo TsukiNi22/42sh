@@ -16,6 +16,7 @@ thonny.exe
 mysh
 42sh
 my_divzero
+my_segfault
 unit_tests
 42sh -_-.pdf
 :

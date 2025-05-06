@@ -27,7 +27,7 @@ static int replace_var_input(main_data_t *data, char *var,
     count = (var - 1) - data->input;
     count += my_strlen(value);
     count += my_strlen(end_input);
-    if (my_malloc_c(&new_input, count) == KO)
+    if (my_malloc_c(&new_input, count + 1) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     if (!my_strcat(new_input, data->input)
         || !my_strcat(new_input, value)
@@ -73,7 +73,7 @@ static int check_home(main_data_t *data, char *var)
     count = my_strlen(data->input) - 1;
     *var = '\0';
     count += my_strlen(my_home);
-    if (my_malloc_c(&new_input, count) == KO)
+    if (my_malloc_c(&new_input, count + 1) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     if (!my_strcat(new_input, data->input)
         || !my_strcat(new_input, my_home)
@@ -90,13 +90,17 @@ int replace_var(main_data_t *data)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     for (int i = 0; data->input[i]; i++) {
         if ((i == 0 || data->input[i - 1] != data->esc_char)
-            && data->input[i] == '$')
-            check_env(data, &data->input[i + 1]);
+            && data->input[i] == '$'
+            && check_env(data, &data->input[i + 1]) == KO)
+            return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    }
+    for (int i = 0; data->input[i]; i++) {
         if ((i == 0 || data->input[i - 1] != data->esc_char)
             && (i == 0 || data->input[i - 1] != '~')
             && data->input[i + 1] != '~'
-            && data->input[i] == '~')
-            check_home(data, &data->input[i]);
+            && data->input[i] == '~'
+            && check_home(data, &data->input[i]) == KO)
+            return err_prog(UNDEF_ERR, KO, ERR_INFO);
     }
     return OK;
 }

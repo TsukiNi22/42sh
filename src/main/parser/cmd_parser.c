@@ -45,22 +45,25 @@ static bool is_spe(char *input, int i, bool *spe, char esc_char)
     return (spe[0] || spe[1] || spe[2]);
 }
 
-static int set_cmd(array_t *array, char **ptr, char *input)
+static int set_cmd(array_t *array, char **ptr, char *input, bool spe)
 {
     char *str = NULL;
-    int len = 0;
+    int var[2] = {0};
 
     if (!array || !ptr || !input)
         return err_prog(PTR_ERR, KO, ERR_INFO);
-    len = input - *ptr;
-    if (len > 0) {
-        if (my_malloc_c(&str, len + 1) == KO)
-            return err_prog(UNDEF_ERR, KO, ERR_INFO);
-        for (int i = 0; i < len; i++)
-            str[i] = (*ptr)[i];
-        if (add_array(array, str) == KO)
-            return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    var[0] = input - *ptr;
+    if (var[0] > 0 && my_malloc_c(&str, var[0] + 1) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    for (int i = 0; i < var[0]; i++) {
+        spe = (i > 0 && (*ptr)[i - 1] == '\\')
+        || ((*ptr)[i] != '\\' && (*ptr)[i] != '\'' && (*ptr)[i] != '\"'
+        && (*ptr)[i] != '(' && (*ptr)[i] != ')');
+        str[i - var[1]] = (*ptr)[i] * spe;
+        var[1] += !spe;
     }
+    if (var[0] > 0 && add_array(array, str) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
     *ptr = input + 1;
     return OK;
 }
@@ -183,7 +186,7 @@ int cmd_parser(main_data_t *data, array_t *array, char *input, int i)
         if (is_spe(input, i, spe, data->esc_char))
             continue;
         if ((input[i] == ' ' || input[i] == '\t')
-            && set_cmd(array->data[array->len - 1], &ptr, &input[i]) == KO)
+            && set_cmd(array->data[array->len - 1], &ptr, &input[i], 0) == KO)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
         i += 2 * (input[i + 1] == data->esc_char) * !(!input[i + 1]);
     }
@@ -191,5 +194,5 @@ int cmd_parser(main_data_t *data, array_t *array, char *input, int i)
     if (spe[0] || spe[1] || spe[2])
         return my_printf("Unmatched '%c'.\n",
         '\'' * spe[0] + '\"' * spe[1] + '(' * spe[2]);
-    return set_cmd(array->data[array->len - 1], &ptr, &input[i]);
+    return set_cmd(array->data[array->len - 1], &ptr, &input[i], 0);
 }

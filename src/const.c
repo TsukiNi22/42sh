@@ -7,31 +7,41 @@
 
 #include "minishell.h"
 
+char const *rc_ligne[] = {
+    "# Welcome adventure to the bananarc if you're here i ",
+    "should tell you this before anything else:\n",
+    "# You know, I don t think there are good or bad descriptions,\n",
+    "# for me, life is all about functions...\n",
+    "#\n",
+    "# The bananarc execute each lines stored in this file ",
+    "at the initialisation, like a user input\n",
+    NULL
+};
+
 char const *help_ligne[] = {
-    "Description:\n",
-    "\tMysh made by TsukiNi22, as the objective to act like a shell\n\n",
+    "Usage:\n",
+    "\tbinary_path [argument]+\n",
+    "\tbuiltin [argument]+\n\n",
     "Builtin:\n",
     "\t-exit [exit_value]\n",
-    "\t-cd [path]\n",
+    "\t-cd [path | -]\n",
     "\t-env\n",
     "\t-setenv [var_name | var_name var_value]\n",
-    "\t-unsetenv var_name1 [var_name2 ...]",
+    "\t-unsetenv [var_name]+",
     "\t(doesn't support the '*' wildcard)\n\n",
     "Builtin Bonus:\n",
-    "\t-bonus [true | false]\n",
-    "\t-color [r_value | r_value g_value | r_value g_value b_value]\n",
     "\t-help\n",
+    "\t-color [r_value | r_value g_value | r_value g_value b_value]",
+    "\t(default value: 255)\n",
     "\t-alias [alias_name | alias_name alias_value]\n",
-    "\t-unalias alias_name1 [alias_name2 ...]\n",
-    "\t-history [number_to_diplay]\n",
-    "\t-source [-c | --create]\n",
+    "\t-unalias [alias_name]+\n",
+    "\t-history [number_to_diplay]",
+    "\t(default value: all history)\n",
+    "\t-source [-c | --create | file_name]\n",
     "\t-rehash\n",
-    "\t-.SILENT [true | false]\n\n",
-    "Other:\n",
-    "\t-An history file \'~/.mysh_history\'\n",
-    "\t-A source file \'~/.myshrc\'\n",
-    "\t-Handle the \';\'\n",
-    "\t-Prompt with error return / executive path / git detection\n",
+    "\t-set [var_name | var_name var_value]\n",
+    "\t-unset [var_name]+\n",
+    "\t-.SILENT [true | false]\n",
     NULL
 };
 
