@@ -7,6 +7,17 @@
 
 #include "minishell.h"
 
+char const *rc_ligne[] = {
+    "# Welcome adventure to the bananarc if you're here i ",
+    "should tell you this before anything else:\n",
+    "# You know, I don t think there are good or bad descriptions,\n",
+    "# for me, life is all about functions...\n",
+    "#\n",
+    "# The bananarc execute each lines stored in this file ",
+    "at the initialisation, like a user input\n",
+    NULL
+};
+
 char const *help_ligne[] = {
     "Usage:\n",
     "\tbinary_path [argument]+\n",
@@ -20,10 +31,12 @@ char const *help_ligne[] = {
     "\t(doesn't support the '*' wildcard)\n\n",
     "Builtin Bonus:\n",
     "\t-help\n",
-    "\t-color [r_value | r_value g_value | r_value g_value b_value]\n",
+    "\t-color [r_value | r_value g_value | r_value g_value b_value]",
+    "\t(default value: 255)\n",
     "\t-alias [alias_name | alias_name alias_value]\n",
-    "\t-unalias alias_name1 [alias_name2 ...]\n",
-    "\t-history [number_to_diplay]\n",
+    "\t-unalias [alias_name]+\n",
+    "\t-history [number_to_diplay]",
+    "\t(default value: all history)\n",
     "\t-source [-c | --create | file_name]\n",
     "\t-rehash\n",
     "\t-set [var_name | var_name var_value]\n",
