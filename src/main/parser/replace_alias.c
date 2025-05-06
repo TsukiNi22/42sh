@@ -13,6 +13,28 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+static bool is_alias_char(char c)
+{
+    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
+        return true;
+    return false;
+}
+
+static bool is_alias_str(char *str)
+{
+    char c = '\0';
+
+    if (!str)
+        return false;
+    for (int i = 0; str[i]; i++) {
+        c = str[i];
+        if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
+            || (c >= '0' && c <= '9') || c == '_'))
+            return false;
+    }
+    return true;
+}
+
 static bool find_setup(main_data_t *data, char *str, char **save)
 {
     if (!data || !str || !save)
@@ -39,21 +61,14 @@ static int find_alias(main_data_t *data, char *input, char **save, int *size)
         str = my_strndup(input, i + 1);
         if (!str)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
-        end = !is_valid_str(str);
+        end = !is_alias_str(str);
         free(str);
     }
     if (end || !input[i]) {
-        if (find_setup(data, my_strndup(input, i), save))
-            *size = i;
+        if (find_setup(data, my_strndup(input, i - end), save))
+            *size = i - end;
     }
     return OK;
-}
-
-static bool is_alias_char(char c)
-{
-    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
-        return true;
-    return false;
 }
 
 static int replace_alias_input(main_data_t *data, char *save, int i, int size)
@@ -69,11 +84,11 @@ static int replace_alias_input(main_data_t *data, char *save, int i, int size)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     data->input[i] = '\0';
     count = my_strlen(data->input) +
-    my_strlen(value) + my_strlen(data->input + size);
+    my_strlen(value) + my_strlen(&data->input[i] + size);
     if (my_malloc_c(&str, count + 1) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     if (!my_strcat(str, data->input) || !my_strcat(str, value)
-        || !my_strcat(str, data->input + size))
+        || !my_strcat(str, &data->input[i] + size))
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     free(data->input);
     data->input = str;
@@ -89,8 +104,7 @@ int replace_alias(main_data_t *data, bool *done)
     if (!data || !done)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     for (int i = 0; res == OK && data->input[i]; i++) {
-        if ((i == 0 || (!is_alias_char(data->input[i - 1])
-            && data->input[i - 1] != data->esc_char))
+        if ((i == 0 || data->input[i - 1] == ' ' || data->input[i + 1] == '\t')
             && is_alias_char(data->input[i])
             && find_alias(data, &data->input[i], &save, &size) == KO)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
