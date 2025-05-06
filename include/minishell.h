@@ -22,14 +22,14 @@
     /* DEFINE */
 
     /* myshrc */
-    #define MYSHRC_FILE ".myshrc"
+    #define MYSHRC_FILE ".bananarc"
 
     /* prompt */
     #define GIT_FILE ".git/HEAD"
 
     /* history */
     #define HISTORY_SIZE 50000
-    #define HISTORY_FILE ".mysh_history"
+    #define HISTORY_FILE ".banana_history"
 
     /* builtin */
     #define BUILTIN_MIN EXIT
@@ -253,6 +253,9 @@ int arrows(main_data_t *data, int *cursor_pos, int str_len, char **str);
 
 //----------------------------------------------------------------//
 /* GLOBAL_CONST */
+
+/* rc_init_line */
+extern char const *rc_ligne[];
 
 /* help_builtin */
 extern char const *help_ligne[];
