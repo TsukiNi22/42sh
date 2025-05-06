@@ -81,6 +81,7 @@ SYNTAX := 	check_syntax/check_syntax_exit.c \
 			check_syntax/check_syntax_source.c \
 			check_syntax/check_syntax_rehash.c \
 			check_syntax/check_syntax_silent.c	\
+			check_syntax/check_syntax_clear.c \
 			check_syntax/check_syntax_set.c	\
 			check_syntax/check_syntax_unset.c
 
@@ -97,6 +98,7 @@ BUILTIN := 	builtin/exit.c \
 			builtin/source.c \
 			builtin/rehash.c \
 			builtin/silent.c \
+			builtin/clear.c \
 			builtin/set.c \
 			builtin/unset.c
 
