@@ -65,6 +65,11 @@ jobs:
     container:
       image: epitechcontent/epitest-docker
     steps:
+      - name: Install CSFML
+        run: |
+          apt-get update
+          apt-get install -y libcsfml-dev
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -77,11 +82,6 @@ jobs:
       - name: Clean compilation artifacts
         run: make clean
         if: always()
-
-      - name: Install CSFML
-        run: |
-          apt-get update
-          apt-get install -y libcsfml-dev
 
       - name: Check executables
         run: |
