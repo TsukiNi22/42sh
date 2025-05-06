@@ -91,8 +91,8 @@ int input_handler(main_data_t *data)
     char *str = malloc(sizeof(char) * MAX_INPUT_STR);
     int pos = 0;
     char c = 0;
-    data->nb_press = 0;
 
+    data->nb_press = 0;
     str[pos] = '\0';
     while (1) {
         if (sigint(false, false) == 1 && cc_handler(data, &pos, &str) == 0)
