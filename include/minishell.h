@@ -77,6 +77,8 @@ typedef enum builtin_func_e {
     CD,
     SETENV,
     UNSETENV,
+    SET,
+    UNSET,
     ENV,
     COLOR,
     HELP,
@@ -85,7 +87,7 @@ typedef enum builtin_func_e {
     HISTORY,
     SOURCE,
     REHASH,
-    SILENT
+    SILENT,
 } builtin_func_t;
 
 /* data */
@@ -108,6 +110,9 @@ typedef struct main_data_s {
 
     /* alias */
     hashtable_t *alias;
+
+    /* variable */
+    hashtable_t *var;
 
     /* path */
     char *last_path;
@@ -203,6 +208,8 @@ int check_syntax_exit(main_data_t *data, array_t *input, int start);
 int check_syntax_cd(main_data_t *data, array_t *input, int start);
 int check_syntax_setenv(main_data_t *data, array_t *input, int start);
 int check_syntax_unsetenv(main_data_t *data, array_t *input, int start);
+int check_syntax_set(main_data_t *data, array_t *input, int start);
+int check_syntax_unset(main_data_t *data, array_t *input, int start);
 int check_syntax_env(main_data_t *data, array_t *input, int start);
 int check_syntax_color(main_data_t *data, array_t *input, int start);
 int check_syntax_help(main_data_t *data, array_t *input, int start);
@@ -219,6 +226,8 @@ int builtin_exit(main_data_t *data, array_t *input, int start);
 int builtin_cd(main_data_t *data, array_t *input, int start);
 int builtin_setenv(main_data_t *data, array_t *input, int start);
 int builtin_unsetenv(main_data_t *data, array_t *input, int start);
+int builtin_set(main_data_t *data, array_t *input, int start);
+int builtin_unset(main_data_t *data, array_t *input, int start);
 int builtin_env(main_data_t *data, array_t *input, int start);
 int builtin_color(main_data_t *data, array_t *input, int start);
 int builtin_help(main_data_t *data, array_t *input, int start);

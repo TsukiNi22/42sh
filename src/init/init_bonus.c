@@ -18,7 +18,8 @@ int init_bonus(main_data_t *data)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     data->silent = false;
     data->alias = new_hashtable(&hash, DEFAULT_HASH_SIZE);
-    if (!data->alias)
+    data->var = new_hashtable(&hash, DEFAULT_HASH_SIZE);
+    if (!data->alias || !data->var)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     data->relative_path = NULL;
     data->return_value = OK;

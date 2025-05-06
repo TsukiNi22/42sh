@@ -79,7 +79,9 @@ SYNTAX := 	check_syntax/check_syntax_exit.c \
 			check_syntax/check_syntax_history.c \
 			check_syntax/check_syntax_source.c \
 			check_syntax/check_syntax_rehash.c \
-			check_syntax/check_syntax_silent.c
+			check_syntax/check_syntax_silent.c	\
+			check_syntax/check_syntax_set.c	\
+			check_syntax/check_syntax_unset.c
 
 BUILTIN := 	builtin/exit.c \
 			builtin/cd.c \
@@ -93,7 +95,9 @@ BUILTIN := 	builtin/exit.c \
 			builtin/history.c \
 			builtin/source.c \
 			builtin/rehash.c \
-			builtin/silent.c
+			builtin/silent.c	\
+			builtin/set.c	\
+			builtin/unset.c
 
 FILES := $(INIT) $(SIGNAL) $(GLOBAL) $(MAIN) $(UPDATE)
 FILES += $(PARSER) $(REDIRECT) $(SYNTAX) $(BUILTIN)
