@@ -61,7 +61,8 @@ UPDATE :=	update/sys_func_update.c
 PARSER := 	main/parser/inputs_parser.c \
 			main/parser/input_parser.c \
 			main/parser/cmd_parser.c \
-			main/parser/replace_var.c
+			main/parser/replace_var.c \
+			main/parser/replace_alias.c
 
 REDIRECT := main/redirection/set_redirection.c \
 			main/redirection/get_heredoc.c

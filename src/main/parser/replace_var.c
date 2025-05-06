@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <stdbool.h>
 
 static int replace_var_input(main_data_t *data, char *var,
     char *end_input, char c)
@@ -38,13 +39,14 @@ static int replace_var_input(main_data_t *data, char *var,
     return OK;
 }
 
-static int check_env(main_data_t *data, char *var)
+static int check_env(main_data_t *data, char *var, bool *done)
 {
     char c = '\0';
     int nb_lettre_var = 0;
 
-    if (!data)
+    if (!data || !var || !done)
         return OK;
+    *done = true;
     c = *var;
     if (!((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) && c != '_')
         return OK;
@@ -62,12 +64,16 @@ static int check_env(main_data_t *data, char *var)
     return OK;
 }
 
-static int check_home(main_data_t *data, char *var)
+static int check_home(main_data_t *data, char *var, bool *done)
 {
-    char *my_home = ht_search(data->env, "HOME");
     char *new_input = NULL;
+    char *my_home = NULL;
     int count = 0;
 
+    if (!data || !var || !done)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    *done = true;
+    my_home = ht_search(data->env, "HOME");
     if (!my_home)
         return err_system(data, OK, NULL, "HOME is not defined");
     count = my_strlen(data->input) - 1;
@@ -84,14 +90,14 @@ static int check_home(main_data_t *data, char *var)
     return OK;
 }
 
-int replace_var(main_data_t *data)
+int replace_var(main_data_t *data, bool *done)
 {
-    if (!data)
+    if (!data || !done)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     for (int i = 0; data->input[i]; i++) {
         if ((i == 0 || data->input[i - 1] != data->esc_char)
             && data->input[i] == '$'
-            && check_env(data, &data->input[i + 1]) == KO)
+            && check_env(data, &data->input[i + 1], done) == KO)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
     }
     for (int i = 0; data->input[i]; i++) {
@@ -99,7 +105,7 @@ int replace_var(main_data_t *data)
             && (i == 0 || data->input[i - 1] != '~')
             && data->input[i + 1] != '~'
             && data->input[i] == '~'
-            && check_home(data, &data->input[i]) == KO)
+            && check_home(data, &data->input[i], done) == KO)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
     }
     return OK;

@@ -40,10 +40,17 @@ void set_signal(void)
 
 int do_input(main_data_t *data)
 {
+    bool done = true;
+
     if (!data)
         return err_prog(PTR_ERR, KO, ERR_INFO);
-    if (!data->out && !data->err_sys && replace_var(data) == KO)
-        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    for (int i = 0; done && i < 10; i++) {
+        done = false;
+        if (!data->out && !data->err_sys && replace_alias(data, &done) == KO)
+            return err_prog(UNDEF_ERR, KO, ERR_INFO);
+        if (!data->out && !data->err_sys && replace_var(data, &done) == KO)
+            return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    }
     if (!data->out && !data->err_sys && inputs_parser(data) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     if (!data->out && !data->err_sys && check_syntax(data) == KO)

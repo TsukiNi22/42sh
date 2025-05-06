@@ -158,7 +158,8 @@ int parser(main_data_t *data, array_t *array, char **input, int *i);
 int cmd_parser(main_data_t *data, array_t *array, char *input, int i);
 int check_syntax(main_data_t *data); // Error: KO
 int get_input_type(main_data_t *data, array_t *input); // Error: KO
-int replace_var(main_data_t *data);
+int replace_alias(main_data_t *data, bool *done); // Error: KO
+int replace_var(main_data_t *data, bool *done); // Error: KO
 
 /* redirection */ // Error: KO
 int set_redirection(main_data_t *data, array_t *input, array_t *inputs, int i);
