@@ -39,6 +39,13 @@ static int replace_var_input(main_data_t *data, char *var,
     return OK;
 }
 
+static bool is_var_char(char c)
+{
+    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
+        return true;
+    return false;
+}
+
 static int check_env(main_data_t *data, char *var, bool *done)
 {
     char c = '\0';
@@ -48,13 +55,12 @@ static int check_env(main_data_t *data, char *var, bool *done)
         return OK;
     *done = true;
     c = *var;
-    if (!((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) && c != '_')
+    if (!is_var_char(c) && c != '_')
         return OK;
     for (nb_lettre_var = 0; var; nb_lettre_var++) {
         if (!((var[nb_lettre_var] >= '0' && var[nb_lettre_var] <= '9')
             || var[nb_lettre_var] == '_'
-            || (var[nb_lettre_var] >= 'A' && var[nb_lettre_var] <= 'Z')
-            || (var[nb_lettre_var] >= 'a' && var[nb_lettre_var] <= 'z')))
+            || is_var_char(var[nb_lettre_var])))
             break;
     }
     *(var - 1) = '\0';
@@ -76,13 +82,11 @@ static int check_home(main_data_t *data, char *var, bool *done)
     my_home = ht_search(data->env, "HOME");
     if (!my_home)
         return err_system(data, OK, NULL, "HOME is not defined");
-    count = my_strlen(data->input) - 1;
+    count = (my_strlen(data->input) - 1) + my_strlen(my_home);
     *var = '\0';
-    count += my_strlen(my_home);
     if (my_malloc_c(&new_input, count + 1) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
-    if (!my_strcat(new_input, data->input)
-        || !my_strcat(new_input, my_home)
+    if (!my_strcat(new_input, data->input) || !my_strcat(new_input, my_home)
         || !my_strcat(new_input, var + 1))
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     free(data->input);
