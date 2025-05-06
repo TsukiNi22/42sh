@@ -116,7 +116,7 @@ jobs:
 
   push_to_mirror:
     runs-on: ubuntu-latest
-    needs: [run_unitests]
+    needs: [check_coding_style]
     if: ${{ github.event_name == 'push' && success() }}
     steps:
       - name: Checkout repository
