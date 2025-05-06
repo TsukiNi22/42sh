@@ -44,12 +44,12 @@ SIGNAL :=	handle_signal/sigsegv.c \
 GLOBAL :=	main.c \
 			const.c \
 			minishell.c \
-			free_data.c \
-			arrows.c	\
+			free_data.c
 
 MAIN := 	main/prompt.c \
 			main/get_input.c \
 			main/autocompletion.c \
+			main/arrows.c \
 			main/input.c	\
 			main/history.c \
 			main/check_syntax.c \
@@ -96,8 +96,8 @@ BUILTIN := 	builtin/exit.c \
 			builtin/history.c \
 			builtin/source.c \
 			builtin/rehash.c \
-			builtin/silent.c	\
-			builtin/set.c	\
+			builtin/silent.c \
+			builtin/set.c \
 			builtin/unset.c
 
 PTY := 		bonus/pty/display_pty.c \
