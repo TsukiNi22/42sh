@@ -96,19 +96,34 @@ static int set_file(main_data_t *data, array_t *input, char **file, char *path)
     return OK;
 }
 
+static int set_file_arg(char **file, char *path)
+{
+    if (!file || !path)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    *file = get_file(path);
+    if (!(*file))
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    return OK;
+}
+
 int builtin_source(main_data_t *data, array_t *input, UNUSED int start)
 {
     array_t *inputs_save = NULL;
     char *input_save = NULL;
     char **lines = NULL;
     char *file = NULL;
-    char *path = NULL;
+    bool c = false;
 
     if (!data || !input)
         return err_prog(PTR_ERR, KO, ERR_INFO);
-    path = get_full_path(ht_search(data->env, "HOME"), MYSHRC_FILE);
-    if (set_file(data, input, &file, path) == KO)
+    c = (input->len - start == 1
+    || my_strcmp(input->data[start + 1], "-c") == 0
+    || my_strcmp(input->data[start + 1], "--create") == 0);
+    if (c && set_file(data, input, &file,
+        get_full_path(ht_search(data->env, "HOME"), MYSHRC_FILE)) == KO)
         return OK;
+    if (!c && set_file_arg(&file, input->data[start + 1]) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
     lines = str_to_str_array(file, "\n", false);
     free(file);
     input_save = data->input;
