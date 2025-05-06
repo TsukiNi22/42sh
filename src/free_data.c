@@ -50,8 +50,10 @@ int free_input(void *input)
 
 static void close_port(int stdin_save, int stdout_save)
 {
-    close(stdin_save);
-    close(stdout_save);
+    if (stdin_save != KO)
+        close(stdin_save);
+    if (stdout_save != KO)
+        close(stdout_save);
 }
 
 static int clear_redirection_local(main_data_t *data)
@@ -70,13 +72,31 @@ static int clear_redirection_local(main_data_t *data)
     return OK;
 }
 
+static int free_terminal(terminal_buffer_t *terminal)
+{
+    if (!terminal)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    if (terminal->window && terminal->font && terminal->cursor_clock) {
+        sfRenderWindow_destroy(terminal->window);
+        sfFont_destroy(terminal->font);
+        sfClock_destroy(terminal->cursor_clock);
+    }
+    free(terminal);
+    return OK;
+}
+
 static int free_prompt_string(main_data_t *data)
 {
     if (!data)
         return err_prog(PTR_ERR, KO, ERR_INFO);
-    free(data->cmd_separator);
-    free(data->conditional_string[0]);
-    free(data->conditional_string[1]);
+    if (free_terminal(data->terminal) == KO)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    if (data->cmd_separator)
+        free(data->cmd_separator);
+    if (data->conditional_string[0] && data->conditional_string[1]) {
+        free(data->conditional_string[0]);
+        free(data->conditional_string[1]);
+    }
     for (int i = 0; i < 5; i++)
         free(data->redirection_string[i]);
     return delete_array(&(data->inputs), &free_cmd);
@@ -102,6 +122,6 @@ int free_data(main_data_t *data)
         free(data->sys_mtime);
     }
     close_port(data->stdin_save, data->stdout_save);
-    free_prompt_string(data);
-    return clear_redirection_local(data);
+    clear_redirection_local(data);
+    return free_prompt_string(data);
 }

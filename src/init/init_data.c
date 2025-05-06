@@ -35,7 +35,9 @@ int init_data(main_data_t *data)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     if (init_bonus(data) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
-    if (!data->input_redirect && basic_exe(data) == KO)
+    if (!data->pty && !data->input_redirect && basic_exe(data) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    if (data->pty && init_term(data) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     return OK;
 }

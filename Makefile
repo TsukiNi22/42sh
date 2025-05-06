@@ -19,7 +19,7 @@ W += -Wuninitialized -Wmaybe-uninitialized
 
 DEBUG := -g -ggdb3
 
-CPPFLAGS := -I ./include/
+CPPFLAGS := -I ./include/ -lcsfml-graphics -lcsfml-window -lcsfml-system
 LDFLAGS := -L ./lib/ -lmy
 CFLAGS := $(W)
 
@@ -33,23 +33,24 @@ INIT :=		init/init_data.c \
 			init/init_global.c \
 			init/init_prompt.c \
 			init/init_env.c \
-			init/init_bonus.c
+			init/init_bonus.c \
+			init/init_term.c
 
 SIGNAL :=	handle_signal/sigsegv.c \
 			handle_signal/sigint.c \
 			handle_signal/sigtstp.c \
 			handle_signal/sigquit.c
 
-GLOBAL :=	autocompletion.c \
-			main.c \
+GLOBAL :=	main.c \
 			const.c \
 			minishell.c \
-			free_data.c \
-			input.c	\
-			arrows.c	\
+			free_data.c
 
 MAIN := 	main/prompt.c \
 			main/get_input.c \
+			main/autocompletion.c \
+			main/arrows.c \
+			main/input.c	\
 			main/history.c \
 			main/check_syntax.c \
 			main/get_input_type.c \
@@ -61,7 +62,8 @@ UPDATE :=	update/sys_func_update.c
 PARSER := 	main/parser/inputs_parser.c \
 			main/parser/input_parser.c \
 			main/parser/cmd_parser.c \
-			main/parser/replace_var.c
+			main/parser/replace_var.c \
+			main/parser/replace_alias.c
 
 REDIRECT := main/redirection/set_redirection.c \
 			main/redirection/get_heredoc.c
@@ -78,7 +80,9 @@ SYNTAX := 	check_syntax/check_syntax_exit.c \
 			check_syntax/check_syntax_history.c \
 			check_syntax/check_syntax_source.c \
 			check_syntax/check_syntax_rehash.c \
-			check_syntax/check_syntax_silent.c
+			check_syntax/check_syntax_silent.c	\
+			check_syntax/check_syntax_set.c	\
+			check_syntax/check_syntax_unset.c
 
 BUILTIN := 	builtin/exit.c \
 			builtin/cd.c \
@@ -92,11 +96,17 @@ BUILTIN := 	builtin/exit.c \
 			builtin/history.c \
 			builtin/source.c \
 			builtin/rehash.c \
-			builtin/silent.c
+			builtin/silent.c \
+			builtin/set.c \
+			builtin/unset.c
+
+PTY := 		bonus/pty/display_pty.c \
+			bonus/pty/pty_handler.c \
+			bonus/pty/pty_exec_handling.c
 
 FILES := $(INIT) $(SIGNAL) $(GLOBAL) $(MAIN) $(UPDATE)
 FILES += $(PARSER) $(REDIRECT) $(SYNTAX) $(BUILTIN)
-SRC := $(addprefix src/, $(FILES))
+SRC := $(addprefix src/, $(FILES)) $(PTY)
 OBJ := $(SRC:%.c=$(BUILD_DIR)/%.o)
 
 TEST_OBJ := $(filter-out $(BUILD_DIR)/src/main.o, $(OBJ))

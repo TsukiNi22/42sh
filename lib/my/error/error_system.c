@@ -9,8 +9,30 @@
 #include "minishell.h"
 #include "write.h"
 #include "error.h"
+#include <pty.h>
+#include <sys/wait.h>
 #include <errno.h>
 #include <stdbool.h>
+
+static int pty_print(main_data_t *data, char const *info, char const *err)
+{
+    pid_t pid = OK;
+    int status = 0;
+
+    if (!data)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    pid = forkpty(&data->master_fd, NULL, NULL, NULL);
+    if (pid == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    if (pid == OK) {
+        print_error_system(info, err);
+        _exit(OK);
+    }
+    if (pty_exec_handling(data, pid) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    waitpid(pid, &status, WUNTRACED);
+    return WEXITSTATUS(status);
+}
 
 void err_system_v(void *data, char const *info, char const *err)
 {
@@ -21,7 +43,10 @@ void err_system_v(void *data, char const *info, char const *err)
         ((main_data_t *) data)->err_sys = true;
     if (!SYSTEM_PUT_ERROR)
         return;
-    print_error_system(info, err);
+    if (data && ((main_data_t *) data)->pty)
+        pty_print(data, info, err);
+    else
+        print_error_system(info, err);
 }
 
 void *err_system_n(void *data, char const *info, char const *err)
@@ -33,7 +58,10 @@ void *err_system_n(void *data, char const *info, char const *err)
         ((main_data_t *) data)->err_sys = true;
     if (!SYSTEM_PUT_ERROR)
         return NULL;
-    print_error_system(info, err);
+    if (data && ((main_data_t *) data)->pty)
+        pty_print(data, info, err);
+    else
+        print_error_system(info, err);
     return NULL;
 }
 
@@ -46,6 +74,9 @@ int err_system(void *data, int to_return, char const *info, char const *err)
         ((main_data_t *) data)->err_sys = true;
     if (!SYSTEM_PUT_ERROR)
         return to_return;
-    print_error_system(info, err);
+    if (data && ((main_data_t *) data)->pty)
+        pty_print(data, info, err);
+    else
+        print_error_system(info, err);
     return to_return;
 }

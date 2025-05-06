@@ -45,7 +45,7 @@ int hash(char *key, int len)
     if (len < 1)
         return err_prog(ARGV_ERR, KO, ERR_INFO);
     hashed_key = get_nbr_from_str(key, r);
-    ABS(hashed_key);
+    hashed_key = ABS(hashed_key);
     hashed_key >>= (int) (r * ((float) hashed_key / (float) INT_MAX));
     return hashed_key;
 }

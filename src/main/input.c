@@ -95,6 +95,8 @@ int input_handler(main_data_t *data)
     data->nb_press = 0;
     str[pos] = '\0';
     while (1) {
+        if (data->pty)
+            return pty_input_handler(data);
         if (sigint(false, false) == 1 && cc_handler(data, &pos, &str) == 0)
             continue;
         if (read(STDIN_FILENO, &c, 1) < 0 && errno == EINTR)

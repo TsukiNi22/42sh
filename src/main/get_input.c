@@ -24,7 +24,7 @@ size_t choose_input(main_data_t *data)
     }
     if (!data->input_redirect) {
         res = input_handler(data);
-        printf("\n");
+        printf("%c", '\n' * !data->pty);
     }
     if (res == KO) {
         data->out = true;
@@ -41,7 +41,7 @@ int get_input(main_data_t *data)
     free(data->input);
     if (data->inputs && delete_array(&(data->inputs), &free_input) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
-    if (!data->input_redirect && set_prompt(data) == KO)
+    if (!data->pty && !data->input_redirect && set_prompt(data) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     if (choose_input(data) == OK)
         return OK;

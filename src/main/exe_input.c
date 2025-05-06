@@ -12,6 +12,7 @@
 #include "hashtable.h"
 #include "minishell.h"
 #include "error.h"
+#include <pty.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -21,7 +22,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-static int get_size(hashtable_t *env, char *key)
+static int get_size_hash_val(hashtable_t *env, char *key)
 {
     char *value = NULL;
     int size = 0;
@@ -58,7 +59,7 @@ static char **materialise_env(main_data_t *data)
         return err_prog_n(MALLOC_ERR, ERR_INFO);
     env[data->env->keys_nbr] = NULL;
     for (int i = 0; keys[i]; i++) {
-        if (my_malloc_c(&env[i], get_size(data->env, keys[i]) + 1) == KO
+        if (my_malloc_c(&env[i], get_size_hash_val(data->env, keys[i]) + 1) < 0
             || !my_strcat(env[i], keys[i]) || !my_strcat(env[i], "=")
             || !my_strcat(env[i], ht_search(data->env, keys[i])))
             return err_prog_n(UNDEF_ERR, ERR_INFO);
@@ -117,22 +118,22 @@ static void clear_memory_error_exec(main_data_t *data,
     free_array(env);
     free_array(cmd);
     free_data(data);
-    exit(1 + 125 * (errno == ENOEXEC));
+    _exit(1 + 125 * (errno == ENOEXEC));
 }
 
-static void child(main_data_t *data, array_t *input)
+static int child(main_data_t *data, array_t *input)
 {
     char **env = NULL;
     char **cmd = NULL;
     char *cmd_path = NULL;
 
     if (!data || !input || set_pipe_child(data) == KO)
-        exit(EPITECH_ERR);
+        _exit(EPITECH_ERR);
     env = materialise_env(data);
     cmd = materialise_cmd(input);
     cmd_path = get_cmd_path(data->env_path, input, data->binary);
     if (!env || !cmd || !cmd_path)
-        exit(EPITECH_ERR);
+        _exit(EPITECH_ERR);
     execve(cmd_path, cmd, env);
     if (errno == ENOEXEC)
         err_system(data, KO, input->data[*((int *) input->data[0]) + 1],
@@ -141,6 +142,7 @@ static void child(main_data_t *data, array_t *input)
         err_system(data, KO, input->data[*((int *) input->data[0]) + 1],
         strerror(errno));
     clear_memory_error_exec(data, env, cmd, cmd_path);
+    return KO;
 }
 
 static int handle_return(main_data_t *data, pid_t pid, array_t *input, int i)
@@ -151,6 +153,8 @@ static int handle_return(main_data_t *data, pid_t pid, array_t *input, int i)
     if (!data || !input)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     if (set_pipe_parent(data, input, i) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    if (data->pty && pty_exec_handling(data, pid) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     waitpid(pid, &status, WUNTRACED);
     if (WIFSIGNALED(status)) {
@@ -176,12 +180,12 @@ int exe_cmd(main_data_t *data, array_t *cmd, array_t *input, int i)
     if (data->err_sys)
         return OK;
     if (!data->builtin) {
-        pid = fork();
-        if (pid == KO)
-            return err_prog(UNDEF_ERR, KO, ERR_INFO);
-        if (pid == OK)
-            child(data, cmd);
-        if (handle_return(data, pid, input, i) == KO)
+        if (data->pty)
+            pid = forkpty(&data->master_fd, NULL, NULL, NULL);
+        else
+            pid = fork();
+        if (pid == KO || (pid == OK && child(data, cmd) == KO)
+            || (pid != OK && handle_return(data, pid, input, i) == KO))
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
     } else if (builtin_func[data->builtin_val](data,
         cmd, *((int *) cmd->data[0]) + 1) == KO)

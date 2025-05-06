@@ -9,6 +9,7 @@
 #include "write.h"
 #include "file.h"
 #include "my_string.h"
+#include "my_string.h"
 #include "minishell.h"
 #include "error.h"
 #include <fcntl.h>
@@ -96,8 +97,8 @@ int add_history(main_data_t *data, hashtable_t *env, char *input)
     if (!data || !env || !input)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     path = get_full_path(ht_search(env, "HOME"), HISTORY_FILE);
-    if (data->input_redirect || !path)
-    return OK;
+    if (data->input_redirect || !path || my_str_is(input, " \t\n"))
+        return OK;
     if (create_file(path) == KO)
     return err_prog(UNDEF_ERR, KO, ERR_INFO);
     file = get_file(path);
