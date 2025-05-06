@@ -84,7 +84,7 @@ static int display_which(main_data_t *data, char *cmd,
     if (!data || !cmd || !var)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     if (!var[0] && !var[1] && !builtin)
-        err_system(data, OK, cmd, "Was not found");
+        return err_system(data, OK, cmd, "Was not found");
     if (var[0] && !var[1] && !builtin
         && display_path(data, cmd, ht_search(data->env, "PATH")) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
