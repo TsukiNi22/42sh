@@ -58,18 +58,18 @@ static int exec_lines(main_data_t *data, char **lines)
 
 static int create_file(char *path)
 {
+    int res = OK;
     int fd = 0;
 
     if (!path)
         return err_prog(PTR_ERR, KO, ERR_INFO);
-    fd = open(path, O_CREAT | O_WRONLY, 0644);
+    fd = open(path, O_CREAT | O_WRONLY, 00644);
     if (fd == KO)
         return err_prog(OP_FILE_ERR, KO, ERR_INFO);
-    my_putstr(fd, "# Welcome adventure to the myshrc if you're here i "
-    "should tell you this before anything else:\n"
-    "# You know, I don t think there are good or bad descriptions,\n"
-    "# for me, life is all about functions...\n"
-    "#\n# The myshrc execute lines like in the mysh at the initialisation\n");
+    for (int i = 0; rc_ligne[i]; i++)
+        res += my_putstr(fd, rc_ligne[i]);
+    if (res != OK)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
     close(fd);
     return OK;
 }

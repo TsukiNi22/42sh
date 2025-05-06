@@ -251,6 +251,9 @@ int arrows(int *cursor_pos, int len);
 //----------------------------------------------------------------//
 /* GLOBAL_CONST */
 
+/* rc_init_line */
+extern char const *rc_ligne[];
+
 /* help_builtin */
 extern char const *help_ligne[];
 
