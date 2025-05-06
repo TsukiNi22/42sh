@@ -41,6 +41,9 @@ char const *help_ligne[] = {
     "\t-rehash\n",
     "\t-set [var_name | var_name var_value]\n",
     "\t-unset [var_name]+\n",
+    "\t-clear\n",
+    "\t-which [command | alias | builtin]+\n",
+    "\t-where [command | alias | builtin]+\n",
     "\t-.SILENT [true | false]\n",
     NULL
 };
