@@ -149,6 +149,9 @@ typedef struct main_data_s {
     bool source_stoped;
     int source_depth;
 
+    /* exclatmation */
+    bool excla_depth;
+
     /* alias */
     hashtable_t *alias;
 

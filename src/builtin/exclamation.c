@@ -173,6 +173,12 @@ int builtin_exclamation(main_data_t *data, array_t *input, int start)
 
     if (!data || !input)
         return KO;
+    if (data->excla_depth) {
+        data->excla_depth = false;
+        return err_system(data, OK, input->data[start],
+        "Stopped, can't call another '!' within a '!'");
+    }
+   data->excla_depth = true;
     cmd = input->data[start];
     f = read_file(data);
     if (!f)
@@ -184,9 +190,7 @@ int builtin_exclamation(main_data_t *data, array_t *input, int start)
     else
         data->input = execute_str(f, ((char *)input->data[start]) + 1);
     if (!data->input)
-        return err_system(data, OK, cmd, "Can't find a corresponding command"
-        " in history");
-    if (do_input(data) == KO)
-        return err_prog(UNDEF_ERR, KO, ERR_INFO);
-    return OK;
+        return err_system(data, OK, cmd,
+    "Can't find a corresponding command in history");
+    return do_input(data);
 }

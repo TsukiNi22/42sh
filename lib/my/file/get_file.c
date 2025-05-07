@@ -12,6 +12,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include <stdio.h>
 static int get_file_size(char const *file)
 {
     char tmp[4096] = {0};
