@@ -7,6 +7,7 @@
 
 #include "error.h"
 #include "minishell.h"
+#include "my_string.h"
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
@@ -70,8 +71,8 @@ static size_t characters_handling(main_data_t *data, char **str, int *pos,
     if (c == '\t')
         suggest(str, *pos, data);
     if (c == 27) {
-        if (arrows(data, pos, strlen(*str), str))
-            return EXIT_SUCCESS;
+        arrows(data, pos, my_strlen(*str), str);
+        return EXIT_SUCCESS;
     }
     if (c != '\t' && c != '\b' && isprint(c) && *pos < MAX_INPUT_STR - 1)
         add_char(c, str, pos);
@@ -92,7 +93,6 @@ int input_handler(main_data_t *data)
     int pos = 0;
     char c = 0;
 
-    data->nb_press = 0;
     str[pos] = '\0';
     while (1) {
         if (data->pty)

@@ -17,6 +17,7 @@ size_t choose_input(main_data_t *data)
 {
     int res = OK;
 
+    data->nb_press = 0;
     if (data->input_redirect) {
         res = getline(&(data->input), &(size_t){0}, stdin);
         if (res != OK)

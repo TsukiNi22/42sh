@@ -36,13 +36,12 @@ static int len_of_array(char **array)
     return len;
 }
 
-static char *print_input(main_data_t *data, char **array, int len,
-    int len_array)
+static char *print_input(main_data_t *data, char *str)
 {
     write(STDOUT_FILENO, "\33[2K\r", 5);
     print_prompt(data, "no_\n");
-    write(STDOUT_FILENO, array[len_array - data->nb_press], len);
-    return array[len_array - data->nb_press];
+    write(STDOUT_FILENO, str, my_strlen(str));
+    return str;
 }
 
 static char *up_arrow(main_data_t *data, int len_array, int *cursor_pos)
@@ -66,7 +65,7 @@ static char *up_arrow(main_data_t *data, int len_array, int *cursor_pos)
     }
     len = my_strlen(array[data->nb_press]);
     *cursor_pos = len;
-    return print_input(data, array, len, len_array);
+    return print_input(data, array[len_array - data->nb_press]);
 }
 
 int arrows(main_data_t *data, int *cursor_pos, int str_len, char **str)
