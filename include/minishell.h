@@ -47,7 +47,7 @@
     #define BUILTIN_MAX EXCLAMATION
 
     /* input handling */
-    #define MAX_INPUT_STR 2048
+    #define MAX_INPUT_STR 150
     #define VEOF 4
     #define VSIGINT 3
 

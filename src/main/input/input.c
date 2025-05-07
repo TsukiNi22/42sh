@@ -20,9 +20,7 @@ static int input_cmd(char **str, char **input)
 {
     if (!str)
         return EXIT_FAILURE;
-    *input = strdup(str[0]);
-    if (str[0])
-        free(str[0]);
+    *input = *str;
     return EXIT_FAILURE;
 }
 
@@ -49,7 +47,7 @@ static size_t cc_handler(main_data_t *data, int *pos, char **str)
         return EXIT_FAILURE;
     sigint(true, false);
     *pos = 0;
-    str[0][*pos] = '\0';
+    memset(*str, 0, sizeof(char) * (MAX_INPUT_STR + 1));
     print_prompt(data, NULL);
     return EXIT_SUCCESS;
 }
@@ -61,6 +59,8 @@ static void add_char(char c, char **str, int *pos)
     if (!str)
         return;
     for (len = 0; (*str)[*pos + len]; len++);
+    if (len + *pos >= MAX_INPUT_STR - 1)
+        return;
     memmove(*str + *pos + 1, *str + *pos, sizeof(char) * len);
     (*str)[*pos] = c;
     *pos += 1;
@@ -85,6 +85,10 @@ static size_t characters_handling(main_data_t *data, char **str, int *pos,
         suggest(str, *pos, data);
     if (c == 27) {
         arrows(data, pos, my_strlen(*str), str);
+        if (!*str) {
+            my_malloc_c(str, MAX_INPUT_STR + 1);
+            *pos = 0;
+        }
         return EXIT_SUCCESS;
     }
     if (c != '\t' && c != '\b' && isprint(c) && *pos < MAX_INPUT_STR - 1)

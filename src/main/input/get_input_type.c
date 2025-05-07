@@ -84,7 +84,7 @@ int get_input_type(main_data_t *data, array_t *input)
     data->binary = false;
     data->builtin = false;
     data->builtin_val = NONE;
-    if (input->len == 0 || st < 0 || st >= input->len)
+    if (input->len == 0 || st < 0 || st >= (int) input->len)
         return OK;
     if (is_builtin(data, input) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
