@@ -1,6 +1,9 @@
+##
+## EPITECH PROJECT, 2025
 ## Makefile
 ## File description:
-## Radar makefile de la ta
+## You know, I don t think there are good or bad descriptions,
+## for me, life is all about functions...
 ##
 
 CC := gcc

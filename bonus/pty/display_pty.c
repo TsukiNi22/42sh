@@ -31,7 +31,7 @@ static int prompt(sfRenderWindow *window, sfFont *font, int i)
     if (!window || !font)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     text = sfText_create();
-    sfText_setString(text, "$> ");
+    sfText_setString(text, PROMPT);
     sfText_setFont(text, font);
     sfText_setCharacterSize(text, 13);
     sfText_setPosition(text, (sfVector2f){10, 10 + i * 18});
@@ -74,7 +74,7 @@ static int diplay_past_line(terminal_buffer_t *terminal)
             apartenance = terminal->apartenance[i];
             new = true;
         }
-        text(terminal, terminal->lines[i], 10 + 8 * 3 * new, 10 + i * 18, sfWhite);
+        text(terminal, terminal->lines[i], 10 + 8 * PROMPT_SIZE * new, 10 + i * 18, sfWhite);
         new = false;
     }
     return OK;
@@ -86,7 +86,8 @@ static int diplay_actual_line(terminal_buffer_t *terminal)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     prompt(terminal->window, terminal->font, terminal->actual_ligne);
     for (int i = terminal->actual_ligne; i < terminal->line_count; ++i)
-        text(terminal, terminal->lines[i], 10 + 8 * 3 * (i == terminal->actual_ligne), 10 + i * 18, sfGreen);
+        text(terminal, terminal->lines[i], 10 + 8 * PROMPT_SIZE *
+        (i == terminal->actual_ligne), 10 + i * 18, sfGreen);
     return OK;
 }
 
@@ -102,7 +103,7 @@ static int cursor(terminal_buffer_t *terminal)
         cursor = sfRectangleShape_create();
         sfRectangleShape_setSize(cursor, (sfVector2f){8, 13});
         sfRectangleShape_setFillColor(cursor, sfGreen);
-        sfRectangleShape_setPosition(cursor, (sfVector2f){2.5 + 8 * 3 *
+        sfRectangleShape_setPosition(cursor, (sfVector2f){2.5 + 8 * PROMPT_SIZE *
         (terminal->actual_ligne == terminal->line_count) + 8 +
         get_size(terminal->current_line), 10 + terminal->line_count * 18});
         sfRenderWindow_drawRectangleShape(terminal->window, cursor, NULL);
@@ -120,7 +121,7 @@ int display_pty(main_data_t *data)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     if (diplay_actual_line(data->terminal) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
-    text(data->terminal, data->terminal->current_line, 10 + 8 * 3 *
+    text(data->terminal, data->terminal->current_line, 10 + 8 * PROMPT_SIZE *
     (data->terminal->actual_ligne == data->terminal->line_count),
     10 + data->terminal->line_count * 18, sfGreen);
     if (cursor(data->terminal) == KO)

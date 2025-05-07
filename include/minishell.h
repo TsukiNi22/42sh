@@ -42,6 +42,8 @@
     #define VSIGINT 3
 
     /* terminal */
+    #define PROMPT "$> "
+    #define PROMPT_SIZE 3
     #define MAX_LINES 30
     #define MAX_LINE_LENGTH 90
     #define MAX_LINE_SIZE (MAX_LINE_LENGTH * 8)

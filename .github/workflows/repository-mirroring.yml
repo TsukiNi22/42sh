@@ -100,7 +100,7 @@ jobs:
   run_unitests:
     runs-on:
       ubuntu-latest
-    needs: [check_coding_style]
+    needs: [check_program_compilation]
     container:
       image: epitechcontent/epitest-docker
     steps:
@@ -116,7 +116,7 @@ jobs:
 
   push_to_mirror:
     runs-on: ubuntu-latest
-    needs: [check_coding_style]
+    needs: [run_unitests]
     if: ${{ github.event_name == 'push' && success() }}
     steps:
       - name: Checkout repository
