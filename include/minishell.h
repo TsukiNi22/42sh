@@ -22,6 +22,11 @@
     //----------------------------------------------------------------//
     /* DEFINE */
 
+    /* fcntl */
+    #ifndef F_SETPIPE_SZ
+        #define F_SETPIPE_SZ 1031  // Linux Value
+    #endif
+
     /* myshrc */
     #define MYSHRC_FILE ".bananarc"
 
