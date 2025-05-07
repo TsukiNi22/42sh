@@ -82,7 +82,7 @@ static int set_file(main_data_t *data, array_t *input, char **file,
         return err_prog(PTR_ERR, KO, ERR_INFO);
     if (!path) {
         data->return_value = 1;
-        err_system(data, OK, "source", "Can't found the HOME "
+        err_system(data, OK, "source", "Can't find the HOME "
         "environement variable");
         data->source_depth = 0;
         return KO;

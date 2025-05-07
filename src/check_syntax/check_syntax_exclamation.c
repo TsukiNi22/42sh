@@ -12,6 +12,7 @@
 #include "file.h"
 #include "error.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 static int check_exclamation(main_data_t *data)
 {
@@ -22,11 +23,13 @@ static int check_exclamation(main_data_t *data)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     path = get_full_path(ht_search(data->env, "HOME"), HISTORY_FILE);
     if (!path)
-        return err_system(data, OK,
-        "!", "Can't obtain path to ~/.mysh_history");
+        return err_system(data, OK, "!", "Can't found the HOME "
+        "environement variable");
     file = get_file(path);
     if (!file)
-        return err_system(data, OK, "!", "Can't open ~/.mysh_history");
+        return err_system(data, OK, "!",
+    "Can't get the content of ~/.banana_history");
+    free(file);
     return OK;
 }
 

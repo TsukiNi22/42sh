@@ -16,19 +16,6 @@
 #include <string.h>
 #include <unistd.h>
 
-static int is_int(const char *str)
-{
-    int i = 0;
-
-    if (str[0] == '-' || str[0] == '+')
-        i = 1;
-    for (; str[i] != '\0'; i++) {
-        if (!isdigit(str[i]))
-            return KO;
-    }
-    return OK;
-}
-
 static char *read_file(main_data_t *data)
 {
     char *path = NULL;
@@ -166,31 +153,38 @@ static char *execute_str(char *file, char *str)
     return NULL;
 }
 
-int builtin_exclamation(main_data_t *data, array_t *input, int start)
+static int execution(main_data_t *data, array_t *input, int start, char *cmd)
 {
     char *f = NULL;
-    char *cmd = NULL;
 
-    if (!data || !input)
-        return KO;
-    if (data->excla_depth) {
-        data->excla_depth = false;
-        return err_system(data, OK, input->data[start],
-        "Stopped, can't call another '!' within a '!'");
-    }
-   data->excla_depth = true;
-    cmd = input->data[start];
+    if (!data || !input || !cmd)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
     f = read_file(data);
     if (!f)
         return KO;
     if (cmd[1] == '!' && my_strlen(cmd) < 3)
         data->input = execute_last(f);
-    else if (is_int(&cmd[1]) == OK)
+    else if (my_str_isnum(&cmd[1]))
         data->input = execute_n(f, my_atoi(((char *)input->data[start]) + 1));
     else
         data->input = execute_str(f, ((char *)input->data[start]) + 1);
+    return OK;
+}
+
+int builtin_exclamation(main_data_t *data, array_t *input, int start)
+{
+    if (!data || !input)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    if (data->excla_depth) {
+        data->excla_depth = false;
+        return err_system(data, OK, input->data[start],
+        "Stopped, can't call another '!' within a '!'");
+    }
+    data->excla_depth = true;
+    if (execution(data, input, start, input->data[start]) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
     if (!data->input)
-        return err_system(data, OK, cmd,
+        return err_system(data, OK, input->data[start],
     "Can't find a corresponding command in history");
     return do_input(data);
 }
