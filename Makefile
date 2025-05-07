@@ -1,5 +1,3 @@
-##
-## EPITECH PROJECT, 2025
 ## Makefile
 ## File description:
 ## Radar makefile de la ta
@@ -16,11 +14,13 @@ BIN_DIR := $(wildcard /usr/local/bin/)
 
 W := -W -Wall -Wextra -Wpedantic -Wunused-parameter -Wshadow
 W += -Wuninitialized -Wmaybe-uninitialized
+CSFML := -lcsfml-graphics -lcsfml-window -lcsfml-system
 
 DEBUG := -g -ggdb3
 
-CPPFLAGS := -I ./include/ -lcsfml-graphics -lcsfml-window -lcsfml-system
+CPPFLAGS := -I ./include/
 LDFLAGS := -L ./lib/ -lmy
+LDFLAGS += $(CSFML)
 CFLAGS := $(W)
 
 ifeq ($(d), t)
