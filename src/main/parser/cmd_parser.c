@@ -191,7 +191,7 @@ int cmd_parser(main_data_t *data, array_t *array, char *input, int i)
         i += 2 * (input[i + 1] == data->esc_char) * !(!input[i + 1]);
     }
     data->err_sys = (spe[0] || spe[1] || spe[2]);
-    if (spe[0] || spe[1] || spe[2])
+    if (!data->pty && (spe[0] || spe[1] || spe[2]))
         return my_printf("Unmatched '%c'.\n",
         '\'' * spe[0] + '\"' * spe[1] + '(' * spe[2]);
     return set_cmd(array->data[array->len - 1], &ptr, &input[i], 0);

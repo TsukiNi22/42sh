@@ -2,7 +2,8 @@
 ## EPITECH PROJECT, 2025
 ## Makefile
 ## File description:
-## Radar makefile de la ta
+## You know, I don t think there are good or bad descriptions,
+## for me, life is all about functions...
 ##
 
 CC := gcc
@@ -16,11 +17,13 @@ BIN_DIR := $(wildcard /usr/local/bin/)
 
 W := -W -Wall -Wextra -Wpedantic -Wunused-parameter -Wshadow
 W += -Wuninitialized -Wmaybe-uninitialized
+CSFML := -lcsfml-graphics -lcsfml-window -lcsfml-system
 
 DEBUG := -g -ggdb3
 
-CPPFLAGS := -I ./include/ -lcsfml-graphics -lcsfml-window -lcsfml-system
+CPPFLAGS := -I ./include/
 LDFLAGS := -L ./lib/ -lmy
+LDFLAGS += $(CSFML)
 CFLAGS := $(W)
 
 ifeq ($(d), t)
@@ -81,6 +84,9 @@ SYNTAX := 	check_syntax/check_syntax_exit.c \
 			check_syntax/check_syntax_source.c \
 			check_syntax/check_syntax_rehash.c \
 			check_syntax/check_syntax_silent.c	\
+			check_syntax/check_syntax_clear.c \
+			check_syntax/check_syntax_which.c \
+			check_syntax/check_syntax_where.c \
 			check_syntax/check_syntax_set.c	\
 			check_syntax/check_syntax_unset.c
 
@@ -97,6 +103,9 @@ BUILTIN := 	builtin/exit.c \
 			builtin/source.c \
 			builtin/rehash.c \
 			builtin/silent.c \
+			builtin/clear.c \
+			builtin/which.c \
+			builtin/where.c \
 			builtin/set.c \
 			builtin/unset.c
 

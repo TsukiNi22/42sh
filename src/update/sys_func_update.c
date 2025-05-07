@@ -155,7 +155,7 @@ int sys_func_update(main_data_t *data)
     path = ht_search(data->env, "PATH");
     if (!path || my_strcmp(path, "") == 0) {
         if (data->path_changed)
-            my_putstr(STDERR, "No PATH found, automaticly use '/bin.'\n");
+            my_putstr(STDERR, "No PATH found, automaticly use '/bin'\n");
         path = my_strdup("/bin");
     }
     free_path(&(data->env_path));

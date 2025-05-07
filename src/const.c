@@ -41,6 +41,9 @@ char const *help_ligne[] = {
     "\t-rehash\n",
     "\t-set [var_name | var_name var_value]\n",
     "\t-unset [var_name]+\n",
+    "\t-clear\n",
+    "\t-which [command | alias | builtin]+\n",
+    "\t-where [command | alias | builtin]+\n",
     "\t-.SILENT [true | false]\n",
     NULL
 };
@@ -60,6 +63,9 @@ char const *builtin_array_name[] = {
     "history",
     "source",
     "rehash",
+    "clear",
+    "which",
+    "where",
     ".SILENT",
     NULL
 };
@@ -79,6 +85,9 @@ int (* const builtin_check_syntax[])(main_data_t *, array_t *, int) = {
     &check_syntax_history,  // history
     &check_syntax_source,   // source
     &check_syntax_rehash,   // rehash
+    &check_syntax_clear,    // clear
+    &check_syntax_which,    // which
+    &check_syntax_where,    // where
     &check_syntax_silent    // .SILENT
 };
 
@@ -87,8 +96,8 @@ int (* const builtin_func[])(main_data_t *, array_t *, int) = {
     &builtin_cd,        // cd
     &builtin_setenv,    // setenv
     &builtin_unsetenv,  // unsetenv
-    &builtin_set,    // set
-    &builtin_unset,  // unset
+    &builtin_set,       // set
+    &builtin_unset,     // unset
     &builtin_env,       // env
     &builtin_color,     // color
     &builtin_help,      // help
@@ -97,5 +106,8 @@ int (* const builtin_func[])(main_data_t *, array_t *, int) = {
     &builtin_history,   // history
     &builtin_source,    // source
     &builtin_rehash,    // rehash
+    &builtin_clear,     // clear
+    &builtin_which,     // which
+    &builtin_where,     // where
     &builtin_silent     // .SILENT
 };
