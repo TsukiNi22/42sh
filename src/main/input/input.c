@@ -32,8 +32,13 @@ static void backspace(char **str, int *pos)
         return;
     if (*pos > 0) {
         *pos -= 1;
-        str[0][*pos] = '\0';
+        for (int i = *pos; (*str)[i]; i++)
+            (*str)[i] = (*str)[i + 1];
         printf("\b \b");
+        for (int i = *pos; i == 0 || (*str)[i - 1]; i++)
+            printf(" \b%c", (*str)[i]);
+        for (int i = *pos; (*str)[i]; i++)
+            putchar('\b');
         fflush(stdout);
     }
 }
@@ -51,11 +56,19 @@ static size_t cc_handler(main_data_t *data, int *pos, char **str)
 
 static void add_char(char c, char **str, int *pos)
 {
+    int len = 0;
+
     if (!str)
         return;
-    str[0][*pos] = c;
+    for (len = 0; (*str)[*pos + len]; len++);
+    memmove(*str + *pos + 1, *str + *pos, sizeof(char) * len);
+    (*str)[*pos] = c;
     *pos += 1;
     putchar(c);
+    for (int i = *pos; i == 0 || (*str)[i - 1]; i++)
+        printf(" \b%c", (*str)[i]);
+    for (; len > 0; len--)
+        putchar('\b');
     fflush(stdout);
 }
 
