@@ -67,6 +67,7 @@ char const *builtin_array_name[] = {
     "which",
     "where",
     ".SILENT",
+    "!!",
     NULL
 };
 
@@ -88,7 +89,8 @@ int (* const builtin_check_syntax[])(main_data_t *, array_t *, int) = {
     &check_syntax_clear,    // clear
     &check_syntax_which,    // which
     &check_syntax_where,    // where
-    &check_syntax_silent    // .SILENT
+    &check_syntax_silent,   // .SILENT
+    &check_syntax_exclamation // !!
 };
 
 int (* const builtin_func[])(main_data_t *, array_t *, int) = {
@@ -109,5 +111,6 @@ int (* const builtin_func[])(main_data_t *, array_t *, int) = {
     &builtin_clear,     // clear
     &builtin_which,     // which
     &builtin_where,     // where
-    &builtin_silent     // .SILENT
+    &builtin_silent,     // .SILENT
+    &builtin_exclamation // !!
 };

@@ -34,7 +34,7 @@
 
     /* builtin */
     #define BUILTIN_MIN EXIT
-    #define BUILTIN_MAX SILENT
+    #define BUILTIN_MAX EXCLAMATION
 
     /* input handling */
     #define MAX_INPUT_STR 2048
@@ -97,7 +97,8 @@ typedef enum builtin_func_e {
     CLEAR,
     WHICH,
     WHERE,
-    SILENT
+    SILENT,
+    EXCLAMATION
 } builtin_func_t;
 
 /* terminal */
@@ -269,6 +270,7 @@ int check_syntax_clear(main_data_t *data, array_t *input, int start);
 int check_syntax_which(main_data_t *data, array_t *input, int start);
 int check_syntax_where(main_data_t *data, array_t *input, int start);
 int check_syntax_silent(main_data_t *data, array_t *input, int start);
+int builtin_exclamation(main_data_t *data, array_t *input, int start);
 
 /* builtin_func */ // Error: KO
 int builtin_bonus(main_data_t *data, array_t *input, int start);
@@ -290,6 +292,7 @@ int builtin_clear(main_data_t *data, array_t *input, int start);
 int builtin_which(main_data_t *data, array_t *input, int start);
 int builtin_where(main_data_t *data, array_t *input, int start);
 int builtin_silent(main_data_t *data, array_t *input, int start);
+int check_syntax_exclamation(main_data_t *data, array_t *input, int start);
 
 /* exit */
 int free_data(main_data_t *data); // Error: EPITECH_ERR

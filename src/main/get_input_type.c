@@ -22,6 +22,12 @@ static int is_builtin(main_data_t *data, array_t *input)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     start = *((int *) input->data[0]) + 1;
     for (int i = 0; builtin_array_name[i]; i++) {
+        if (((char *)input->data[start])[0] == '!'
+            && my_strlen(input->data[start]) > 1) {
+            data->builtin = true;
+            data->builtin_val = 18;
+            return OK;
+        }
         if (my_strcmp(input->data[start], builtin_array_name[i]) == 0) {
             data->builtin = true;
             data->builtin_val = i;

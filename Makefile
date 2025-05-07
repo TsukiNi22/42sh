@@ -85,7 +85,8 @@ SYNTAX := 	check_syntax/check_syntax_exit.c \
 			check_syntax/check_syntax_which.c \
 			check_syntax/check_syntax_where.c \
 			check_syntax/check_syntax_set.c	\
-			check_syntax/check_syntax_unset.c
+			check_syntax/check_syntax_unset.c \
+			check_syntax/check_syntax_exclamation.c
 
 BUILTIN := 	builtin/exit.c \
 			builtin/cd.c \
@@ -104,7 +105,8 @@ BUILTIN := 	builtin/exit.c \
 			builtin/which.c \
 			builtin/where.c \
 			builtin/set.c \
-			builtin/unset.c
+			builtin/unset.c \
+			builtin/exclamation.c
 
 PTY := 		bonus/pty/display_pty.c \
 			bonus/pty/pty_handler.c \
