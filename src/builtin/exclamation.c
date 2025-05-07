@@ -85,6 +85,18 @@ static char *correct_last(char *second_last_newline, char *last_newline)
     return result;
 }
 
+static size_t get_len(char *file)
+{
+    size_t len = 0;
+
+    if (!file)
+        return 0;
+    len = my_strlen(file);
+    while (len > 0 && (file[len - 1] == '\n' || file[len - 1] == '\r'))
+        len--;
+    return len;
+}
+
 static char *execute_last(char *file)
 {
     size_t len = 0;
@@ -93,11 +105,7 @@ static char *execute_last(char *file)
 
     if (!file)
         return NULL;
-    len = my_strlen(file);
-    if (len == 0)
-        return NULL;
-    while (len > 0 && (file[len - 1] == '\n' || file[len - 1] == '\r'))
-        len--;
+    len = get_len(file);
     if (len == 0)
         return NULL;
     for (char *p = file + len - 1; p >= file; p--) {
