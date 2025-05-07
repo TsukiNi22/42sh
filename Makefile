@@ -50,13 +50,8 @@ GLOBAL :=	main.c \
 			free_data.c
 
 MAIN := 	main/prompt.c \
-			main/get_input.c \
-			main/autocompletion.c \
-			main/arrows.c \
-			main/input.c	\
 			main/history.c \
 			main/check_syntax.c \
-			main/get_input_type.c \
 			main/exe_input.c \
 			main/check_accesible_dir.c
 
@@ -67,6 +62,12 @@ PARSER := 	main/parser/inputs_parser.c \
 			main/parser/cmd_parser.c \
 			main/parser/replace_var.c \
 			main/parser/replace_alias.c
+
+INPUT := 	main/input/input.c \
+			main/input/arrows.c \
+			main/input/autocompletion.c \
+			main/input/get_input.c \
+			main/input/get_input_type.c
 
 REDIRECT := main/redirection/set_redirection.c \
 			main/redirection/get_heredoc.c
@@ -116,7 +117,7 @@ PTY := 		bonus/pty/display_pty.c \
 			bonus/pty/pty_exec_handling.c
 
 FILES := $(INIT) $(SIGNAL) $(GLOBAL) $(MAIN) $(UPDATE)
-FILES += $(PARSER) $(REDIRECT) $(SYNTAX) $(BUILTIN)
+FILES += $(PARSER) $(INPUT) $(REDIRECT) $(SYNTAX) $(BUILTIN)
 SRC := $(addprefix src/, $(FILES)) $(PTY)
 OBJ := $(SRC:%.c=$(BUILD_DIR)/%.o)
 
