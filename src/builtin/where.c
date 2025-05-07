@@ -12,7 +12,9 @@
 #include "minishell.h"
 #include "error.h"
 #include <stdlib.h>
+#include <pty.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
@@ -43,6 +45,50 @@ static bool is_valid(char const *cmd_p)
     return true;
 }
 
+static int pty_display_path_setup(main_data_t *data)
+{
+    pid_t pid = OK;
+    int status = 0;
+
+    if (!data)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    if (!data->pty)
+        return my_putstr(STDERR, "No PATH found, automaticly use '/bin'\n");
+    pid = forkpty(&data->master_fd, NULL, NULL, NULL);
+    if (pid == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    if (pid == OK) {
+        if (my_putstr(STDERR, "No PATH found, automaticly use '/bin'\n") == KO)
+            _exit(KO);
+        _exit(OK);
+    }
+    if (pty_exec_handling(data, pid) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    waitpid(pid, &status, WUNTRACED);
+    return WEXITSTATUS(status);
+}
+
+static int pty_display_path(main_data_t *data, char *cmd_p)
+{
+    pid_t pid = OK;
+    int status = 0;
+
+    if (!data || !cmd_p)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    pid = forkpty(&data->master_fd, NULL, NULL, NULL);
+    if (pid == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    if (pid == OK) {
+        if (my_printf("%s\n", cmd_p) == KO)
+            _exit(KO);
+        _exit(OK);
+    }
+    if (pty_exec_handling(data, pid) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    waitpid(pid, &status, WUNTRACED);
+    return WEXITSTATUS(status);
+}
+
 static int display_path(main_data_t *data, char *cmd, char *path)
 {
     char *cmd_p = NULL;
@@ -50,17 +96,17 @@ static int display_path(main_data_t *data, char *cmd, char *path)
     if (!data || !cmd)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     if (!path || my_strcmp(path, "") == 0) {
-        if (my_putstr(STDERR, "No PATH found, automaticly use '/bin'\n") == KO)
+        if (pty_display_path_setup(data) == KO)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
         path = "/bin";
     }
     free_path(&(data->env_path));
     data->env_path = str_to_str_array(path, ":", false);
     for (int i = 0; data->env_path[i]; i++) {
-        if (!is_accesible_dir(data->env_path[i]))
-            continue;
         cmd_p = get_full_path(data->env_path[i], cmd);
-        if (is_valid(cmd_p) && my_printf("%s\n", cmd_p) == KO)
+        if (is_accesible_dir(data->env_path[i])
+            && is_valid(cmd_p) && ((data->pty && pty_display_path(data, cmd_p))
+            || (!data->pty && my_printf("%s\n", cmd_p) == KO)))
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
         free(cmd_p);
     }
@@ -78,6 +124,29 @@ static bool is_builtin(char *cmd)
     return false;
 }
 
+static int pty_wich(main_data_t *data, char *cmd, char *var[2], bool c)
+{
+    pid_t pid = OK;
+    int status = 0;
+
+    if (!data || !cmd || !var)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    pid = forkpty(&data->master_fd, NULL, NULL, NULL);
+    if (pid == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    if (pid == OK) {
+        if (c && my_printf("%s='%s'\n", cmd, var[1]) == KO)
+            _exit(KO);
+        if (!c && my_printf("%s: Builtin\n", cmd) == KO)
+            _exit(KO);
+        _exit(OK);
+    }
+    if (pty_exec_handling(data, pid) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    waitpid(pid, &status, WUNTRACED);
+    return WEXITSTATUS(status);
+}
+
 static int display_where(main_data_t *data, char *cmd,
     char *var[2], bool builtin)
 {
@@ -88,11 +157,11 @@ static int display_where(main_data_t *data, char *cmd,
     if (var[0]
         && display_path(data, cmd, ht_search(data->env, "PATH")) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
-    if (var[1]
-        && my_printf("%s='%s'\n", cmd, var[1]) == KO)
+    if (var[1] && ((data->pty && pty_wich(data, cmd, var, true) == KO)
+        || (!data->pty && my_printf("%s='%s'\n", cmd, var[1]) == KO)))
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
-    if (builtin
-        && my_printf("%s: Builtin\n", cmd) == KO)
+    if (builtin && ((data->pty && pty_wich(data, cmd, var, false) == KO)
+        || (!data->pty && my_printf("%s: Builtin\n", cmd) == KO)))
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     return OK;
 }

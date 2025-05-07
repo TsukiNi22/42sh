@@ -28,6 +28,9 @@ static int is_a_pty(main_data_t *data)
     if (ht_insert(data->env, my_strdup("TERM"),
         my_strdup("minimal"), &free_hash_data_str) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    if (ht_insert(data->env, my_strdup("HISTSIZE"),
+        my_itoa(HISTORY_SIZE), &free_hash_data_str) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
     return OK;
 }
 
