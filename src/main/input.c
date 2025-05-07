@@ -5,6 +5,7 @@
 ** input.c
 */
 
+#include "memory.h"
 #include "error.h"
 #include "minishell.h"
 #include "my_string.h"
@@ -19,7 +20,6 @@ static int input_cmd(char **str, int pos, char **input)
 {
     if (!str)
         return EXIT_FAILURE;
-    str[0][pos] = '\0';
     *input = strdup(str[0]);
     if (str[0])
         free(str[0]);
@@ -89,11 +89,11 @@ static void eof_handling(main_data_t *data, char *str)
 
 int input_handler(main_data_t *data)
 {
-    char *str = malloc(sizeof(char) * MAX_INPUT_STR);
+    char *str = NULL;
     int pos = 0;
     char c = 0;
 
-    str[pos] = '\0';
+    my_malloc_c(&str, MAX_INPUT_STR + 1);
     while (1) {
         if (data->pty)
             return pty_input_handler(data);
