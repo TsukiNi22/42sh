@@ -186,6 +186,7 @@ int builtin_exclamation(main_data_t *data, array_t *input, int start)
     if (!data->input)
         return err_system(data, OK, cmd, "Can't find a corresponding command"
         " in history");
-    printf("%s\n", data->input);
+    if (do_input(data) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
     return OK;
 }
