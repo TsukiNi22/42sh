@@ -107,6 +107,7 @@ static int redirect_d_right(main_data_t *data, char *file)
 
 static int set_pipefd(main_data_t *data, array_t *input, int i)
 {
+    int new_size = 1 << 20;
     int type = OK;
 
     if (!data || !input)
@@ -115,6 +116,8 @@ static int set_pipefd(main_data_t *data, array_t *input, int i)
         return OK;
     type = *((int *) ((array_t *) input->data[i + 1])->data[1]);
     if (type == PIPE && pipe(data->pipefd) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    if (fcntl(data->pipefd[1], F_SETPIPE_SZ, new_size) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     return OK;
 }

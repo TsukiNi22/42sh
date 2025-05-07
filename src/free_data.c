@@ -72,9 +72,9 @@ static int clear_redirection_local(main_data_t *data)
     return OK;
 }
 
-static int free_terminal(terminal_buffer_t *terminal)
+static int free_terminal(main_data_t *data, terminal_buffer_t *terminal)
 {
-    if (!terminal)
+    if (!data || !terminal)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     if (terminal->window && terminal->font && terminal->cursor_clock) {
         sfRenderWindow_destroy(terminal->window);
@@ -82,6 +82,7 @@ static int free_terminal(terminal_buffer_t *terminal)
         sfClock_destroy(terminal->cursor_clock);
     }
     free(terminal);
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &data->original);
     return OK;
 }
 
@@ -89,7 +90,7 @@ static int free_prompt_string(main_data_t *data)
 {
     if (!data)
         return err_prog(PTR_ERR, KO, ERR_INFO);
-    if (free_terminal(data->terminal) == KO)
+    if (free_terminal(data, data->terminal) == KO)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     if (data->cmd_separator)
         free(data->cmd_separator);
