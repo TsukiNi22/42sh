@@ -95,25 +95,43 @@ static int replace_alias_input(main_data_t *data, char *save, int i, int size)
     return OK;
 }
 
+static bool is_spe(char *input, int i, bool *spe, char esc_char)
+{
+    if (!input || !spe)
+        return err_prog(PTR_ERR, false, ERR_INFO);
+    if (i > 0 && input[i - 1] == esc_char)
+        return false;
+    if (input[i] == '\'' && !spe[1] && !spe[2])
+        spe[0] = !spe[0];
+    if (input[i] == '\"' && !spe[0] && !spe[2])
+        spe[1] = !spe[1];
+    if (input[i] == '(' && !spe[0] && !spe[1] && !spe[2])
+        spe[2] = true;
+    if (input[i] == ')' && !spe[0] && !spe[1] && spe[2])
+        spe[2] = false;
+    return (spe[0] || spe[1] || spe[2]);
+}
+
 int replace_alias(main_data_t *data, bool *done)
 {
     char *save = NULL;
-    int size = KO;
-    int res = OK;
+    int var[2] = {OK};
+    bool spe[3] = {false};
 
     if (!data || !done)
         return err_prog(PTR_ERR, KO, ERR_INFO);
-    for (int i = 0; res == OK && data->input[i]; i++) {
-        if ((i == 0 || data->input[i - 1] == ' ' || data->input[i + 1] == '\t')
+    for (int i = 0; var[1] == OK && data->input[i]; i++) {
+        if (!is_spe(data->input, i, spe, data->esc_char) &&
+            (i == 0 || data->input[i - 1] == ' ' || data->input[i + 1] == '\t')
             && is_alias_char(data->input[i])
-            && find_alias(data, &data->input[i], &save, &size) == KO)
+            && find_alias(data, &data->input[i], &save, &var[0]) == KO)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
         if (save) {
-            res += replace_alias_input(data, save, i, size);
-            i += size;
+            var[1] += replace_alias_input(data, save, i, var[0]);
+            i += var[0];
             free(save);
             save = NULL;
         }
     }
-    return KO * (res != OK);
+    return KO * (var[1] != OK);
 }

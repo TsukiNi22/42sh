@@ -95,6 +95,8 @@ typedef enum builtin_func_e {
     SOURCE,
     REHASH,
     CLEAR,
+    WHICH,
+    WHERE,
     SILENT
 } builtin_func_t;
 
@@ -139,6 +141,10 @@ typedef struct main_data_s {
     bool builtin;
     bool binary;
     builtin_func_t builtin_val;
+
+    /* source */
+    bool source_stoped;
+    int source_depth;
 
     /* alias */
     hashtable_t *alias;
@@ -260,6 +266,8 @@ int check_syntax_history(main_data_t *data, array_t *input, int start);
 int check_syntax_source(main_data_t *data, array_t *input, int start);
 int check_syntax_rehash(main_data_t *data, array_t *input, int start);
 int check_syntax_clear(main_data_t *data, array_t *input, int start);
+int check_syntax_which(main_data_t *data, array_t *input, int start);
+int check_syntax_where(main_data_t *data, array_t *input, int start);
 int check_syntax_silent(main_data_t *data, array_t *input, int start);
 
 /* builtin_func */ // Error: KO
@@ -279,6 +287,8 @@ int builtin_history(main_data_t *data, array_t *input, int start);
 int builtin_source(main_data_t *data, array_t *input, int start);
 int builtin_rehash(main_data_t *data, array_t *input, int start);
 int builtin_clear(main_data_t *data, array_t *input, int start);
+int builtin_which(main_data_t *data, array_t *input, int start);
+int builtin_where(main_data_t *data, array_t *input, int start);
 int builtin_silent(main_data_t *data, array_t *input, int start);
 
 /* exit */

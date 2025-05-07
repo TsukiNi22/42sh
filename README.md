@@ -95,6 +95,8 @@ The terminal also start on it's own if the 42sh is launched not from a terminal
 | `help`                                                          | Display the usage of the 42sh and the builtin                                                                                                                           |
 | `exit [exit_code]`                                              | Exit the shell with 0 or the given exit code                                                                                                                            |
 | `cd [path \| -]`                                                | Change the execution path to the given path or undo the last changement with `-`, when no argument is given automaticly change to the environement variable `HOME`      |
+| `which [command \| alias \| builtin]+`                          | Display the first found utility for each parameters in order: Builtin \| Alias \| Path found in `PATH` environement variable \| Not Found                               |
+| `where [command \| alias \| builtin]+`                          | Display all the founded utilitys for each parameters in order: Not Found \| Path found in `PATH` environement variable \| Alias \| Builtin                              |
 | `env`                                                           | Display the actual environement                                                                                                                                         |
 | `setenv [var_name \| var_name var_value]`                       | Used to setup var of the environement (do the same as `env` when no argument is given)                                                                                  |
 | `unsetenv [var_name]+`                                          | Delete the given environement variable(s)                                                                                                                               |
@@ -105,9 +107,9 @@ The terminal also start on it's own if the 42sh is launched not from a terminal
 | `source [-c \| --create \| file_path]`                          | `source [-c \| --create]` that setup the `~/.bananarc`, `source file_path` source the given file path and if no argument is given, automaticly source the `~/.bananarc` |
 | `history [number_to_diplay]`                                    | Display all or the given number of the last command used (stoked in `~/.banana_history`)                                                                                |
 | `rehash`                                                        | Reload the stoked hashtable of all of the binary recuparated with the environement variable `PATH`                                                                      |
+| `clear`                                                         | Clear the whome terminal printing `^[[H^[[2J` same as `\033[H\033[2J` or `\x1b[H\x1b[2J` in normal terminal, in the `-t` option it's an intern clear of line stoked     |
 | `color [r_value \| r_value g_value \| r_value g_value b_value]` | Change the input color to the given value, if a value is not given it will take by default `255`                                                                        |
 | `.SILENT [true \| false]`                                       | Disable or Enabled the display of some information for some builtin                                                                                                     |
-
 
 [![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=700&size=22&pause=1000&color=F7077E&vCenter=true&width=435&height=30&lines=⛏️Built_using)](https://git.io/typing-svg)
 ---
