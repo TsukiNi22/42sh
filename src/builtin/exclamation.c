@@ -32,17 +32,6 @@ static char *read_file(main_data_t *data)
     return file;
 }
 
-static char *correct_str(char *line_end, char *line_start, char *result)
-{
-    size_t match_len = line_end - line_start;
-
-    if (my_malloc_c(&result, match_len + 1) == KO)
-        return NULL;
-    strncpy(result, line_start, match_len);
-    result[match_len] = '\0';
-    return result;
-}
-
 static char *get_start(char *start, int n)
 {
     int line_count = 1;
@@ -130,49 +119,69 @@ static char *execute_n(char *file, int n)
     return line;
 }
 
-static char *execute_str(char *file, char *str)
+static char *execute_str(char **lines, char *str)
 {
-    char *result = NULL;
-    char *line_start = NULL;
-    char *line_end = NULL;
+    char *line = NULL;
+    int size = 0;
+    int len = 0;
 
-    if (!file || !str)
+    if (!lines || !str)
         return NULL;
-    line_start = file;
-    while (*line_start) {
-        line_end = line_start;
-        while (*line_end && *line_end != '\n')
-            line_end++;
-        if (my_strncmp(line_start, str, my_strlen(str)) == 0)
-            return correct_str(line_end, line_start, result);
-        if (*line_end == '\n')
-            line_start = line_end + 1;
-        else
-            break;
+    for (size = 0; lines[size]; size++);
+    for (len = 0; str[len]; len++);
+    for (int i = size - 1; i >= 0; i--) {
+        if (my_strncmp(lines[i], str, len) == 0) {
+            line = my_strdup(lines[i]);
+            free_array(lines);
+            return line;
+        }
     }
+    free_array(lines);
     return NULL;
 }
 
-static int execution(main_data_t *data, array_t *input, int start, char *cmd)
+static int execution(main_data_t *data, array_t *input, int start, char **line)
 {
+    char *cmd = NULL;
     char *f = NULL;
 
-    if (!data || !input || !cmd)
+    if (!data || !input || !line)
         return err_prog(PTR_ERR, KO, ERR_INFO);
+    cmd = input->data[start];
     f = read_file(data);
     if (!f)
         return KO;
     if (cmd[1] == '!' && my_strlen(cmd) < 3)
-        data->input = execute_last(f);
+        *line = execute_last(f);
     else if (my_str_isnum(&cmd[1]))
-        data->input = execute_n(f, my_atoi(((char *)input->data[start]) + 1));
+        *line = execute_n(f, my_atoi(((char *)input->data[start]) + 1));
     else
-        data->input = execute_str(f, ((char *)input->data[start]) + 1);
+        *line = execute_str(str_to_str_array(f, "\n", false),
+        ((char *)input->data[start]) + 1);
+    return OK;
+}
+
+static int exe_line(main_data_t *data, char *line)
+{
+    array_t *inputs_save = NULL;
+    char *input_save = NULL;
+
+    if (!data || !line)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    input_save = data->input;
+    inputs_save = data->inputs;
+    data->input = line;
+    if (do_input(data) == KO)
+        return err_prog(PTR_ERR, KO, ERR_INFO);
+    data->input = input_save;
+    data->inputs = inputs_save;
     return OK;
 }
 
 int builtin_exclamation(main_data_t *data, array_t *input, int start)
 {
+    char *line = NULL;
+
     if (!data || !input)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     if (data->excla_depth) {
@@ -181,10 +190,13 @@ int builtin_exclamation(main_data_t *data, array_t *input, int start)
         "Stopped, can't call another '!' within a '!'");
     }
     data->excla_depth = true;
-    if (execution(data, input, start, input->data[start]) == KO)
+    if (execution(data, input, start, &line) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     if (!data->input)
         return err_system(data, OK, input->data[start],
-    "Can't find a corresponding command in history");
-    return do_input(data);
+        "Can't find a corresponding command in history");
+    if (exe_line(data, line) == KO)
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    data->excla_depth = false;
+    return OK;
 }

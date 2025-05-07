@@ -39,7 +39,7 @@ int check_syntax_exclamation(main_data_t *data, array_t *input, int start)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     if (input->len - start > 1)
         return err_system(data, OK, "!", "Too many arguments");
-    if (input->len - start == 0)
+    if (input->len - start == 1)
         return check_exclamation(data);
     return OK;
 }

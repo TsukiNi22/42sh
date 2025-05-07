@@ -115,10 +115,12 @@ static int set_pipefd(main_data_t *data, array_t *input, int i)
     if ((size_t) i + 1 > input->len - 1)
         return OK;
     type = *((int *) ((array_t *) input->data[i + 1])->data[1]);
-    if (type == PIPE && pipe(data->pipefd) == KO)
-        return err_prog(UNDEF_ERR, KO, ERR_INFO);
-    if (fcntl(data->pipefd[1], F_SETPIPE_SZ, new_size) == KO)
-        return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    if (type == PIPE) {
+        if (pipe(data->pipefd) == KO)
+            return err_prog(UNDEF_ERR, KO, ERR_INFO);
+        if (fcntl(data->pipefd[1], F_SETPIPE_SZ, new_size) == KO)
+            return err_prog(UNDEF_ERR, KO, ERR_INFO);
+    }
     return OK;
 }
 
