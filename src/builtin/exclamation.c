@@ -192,7 +192,7 @@ int builtin_exclamation(main_data_t *data, array_t *input, int start)
     data->excla_depth = true;
     if (execution(data, input, start, &line) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
-    if (!data->input)
+    if (!line)
         return err_system(data, OK, input->data[start],
         "Can't find a corresponding command in history");
     if (exe_line(data, line) == KO)
