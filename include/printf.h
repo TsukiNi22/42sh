@@ -12,7 +12,7 @@
     /* INCLUDE */
 
     /* type */
-    #include "define.h" // STDIN
+    #include "define.h" // STDOUT
     #include <stdbool.h> // boolean
     #include <stdarg.h> // va_list
 
@@ -20,7 +20,7 @@
     /* DEFINE */
 
     /* default */
-    #define DEFAULT_OUPUT STDIN
+    #define DEFAULT_OUPUT STDOUT
 
     /* flag */
     #define IDENTIFIER '%'
