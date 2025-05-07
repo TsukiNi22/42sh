@@ -14,15 +14,14 @@
 #include <stdlib.h>
 #include <SFML/Graphics.h>
 
-static void enable_raw_mode(main_data_t *data, struct termios *original)
+void enable_raw_mode(main_data_t *data)
 {
     struct termios raw;
 
-    tcgetattr(STDIN_FILENO, original);
-    raw = *original;
+    tcgetattr(STDIN_FILENO, &data->original);
+    raw = data->original;
     raw.c_lflag &= ~(ICANON | ECHO);
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
-    print_prompt(data, NULL);
     fflush(stdout);
 }
 
@@ -63,9 +62,7 @@ int do_input(main_data_t *data)
 
 int minishell(main_data_t *data)
 {
-    struct termios original;
-
-    enable_raw_mode(data, &original);
+    enable_raw_mode(data);
     if (!data)
         return err_prog(PTR_ERR, KO, ERR_INFO);
     if (init_data(data) == KO)
@@ -81,6 +78,6 @@ int minishell(main_data_t *data)
         if (!data->out && do_input(data) == KO)
             return err_prog(UNDEF_ERR, KO, ERR_INFO);
     }
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &original);
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &data->original);
     return OK;
 }

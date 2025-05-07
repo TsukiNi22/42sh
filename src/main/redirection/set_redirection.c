@@ -107,7 +107,7 @@ static int redirect_d_right(main_data_t *data, char *file)
 
 static int set_pipefd(main_data_t *data, array_t *input, int i)
 {
-    int new_size = 1 << 24;
+    int new_size = 1 << 20;
     int type = OK;
 
     if (!data || !input)

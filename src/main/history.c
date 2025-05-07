@@ -100,7 +100,7 @@ int add_history(main_data_t *data, hashtable_t *env, char *input)
     if (data->input_redirect || !path || my_str_is(input, " \t\n"))
         return OK;
     if (create_file(path) == KO)
-    return err_prog(UNDEF_ERR, KO, ERR_INFO);
+        return err_prog(UNDEF_ERR, KO, ERR_INFO);
     file = get_file(path);
     if (!file || check_last(input, file))
         return OK;

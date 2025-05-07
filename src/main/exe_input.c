@@ -134,10 +134,10 @@ static int child(main_data_t *data, array_t *input)
     cmd_path = get_cmd_path(data->env_path, input, data->binary);
     if (!env || !cmd || !cmd_path)
         _exit(EPITECH_ERR);
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &data->original);
     execve(cmd_path, cmd, env);
     if (errno == ENOEXEC)
-        err_system(data, KO, input->data[*((int *) input->data[0]) + 1],
-        "Exec format error. Binary file not executable");
+        err_system(data, KO, input->data[*((int *) input->data[0]) + 1], EX_M);
     else
         err_system(data, KO, input->data[*((int *) input->data[0]) + 1],
         strerror(errno));
@@ -148,7 +148,6 @@ static int child(main_data_t *data, array_t *input)
 static int handle_return(main_data_t *data, pid_t pid, array_t *input, int i)
 {
     int status = OK;
-    int signal = 0;
 
     if (!data || !input)
         return err_prog(PTR_ERR, KO, ERR_INFO);
@@ -157,13 +156,13 @@ static int handle_return(main_data_t *data, pid_t pid, array_t *input, int i)
     if (data->pty && pty_exec_handling(data, pid) == KO)
         return err_prog(UNDEF_ERR, KO, ERR_INFO);
     waitpid(pid, &status, WUNTRACED);
+    enable_raw_mode(data);
     if (WIFSIGNALED(status)) {
-        signal = WTERMSIG(status);
-        data->return_value = 128 + signal;
-        if (signal == SIGFPE)
-            return my_putstr(STDERR, "Floating exception (core dumped)\n");
-        if (signal == SIGSEGV)
-            return my_putstr(STDERR, "Segmentation fault (core dumped)\n");
+        data->return_value = 128 + WTERMSIG(status);
+        if (WTERMSIG(status) == SIGFPE)
+            return my_putstr(STDERR, FL_M);
+        if (WTERMSIG(status) == SIGSEGV)
+            return my_putstr(STDERR, SEG_M);
     } else
         data->return_value = WEXITSTATUS(status);
     return OK;

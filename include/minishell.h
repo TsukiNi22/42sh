@@ -27,15 +27,20 @@
         #define F_SETPIPE_SZ 1031  // Linux Value
     #endif
 
-    /* myshrc */
+    /* rc */
     #define MYSHRC_FILE ".bananarc"
-
-    /* prompt */
-    #define GIT_FILE ".git/HEAD"
 
     /* history */
     #define HISTORY_SIZE 50000
     #define HISTORY_FILE ".banana_history"
+
+    /* prompt */
+    #define GIT_FILE ".git/HEAD"
+
+    /* error */
+    #define EX_M "Exec format error. Binary file not executable"
+    #define FL_M "Floating exception (core dumped)\n"
+    #define SEG_M "Segmentation fault (core dumped)\n"
 
     /* builtin */
     #define BUILTIN_MIN EXIT
@@ -143,6 +148,10 @@ typedef struct main_data_s {
     /* terminal */
     terminal_buffer_t *terminal;
     int master_fd;
+    struct termios original;
+
+    /*arrow*/
+    int nb_press;
 
     /* input_var */
     bool builtin;
@@ -188,9 +197,6 @@ typedef struct main_data_s {
     /* input */
     char *input;
     array_t *inputs;
-
-    /*arrow*/
-    int nb_press;
 } main_data_t;
 
 //----------------------------------------------------------------//
@@ -206,6 +212,7 @@ int add_history(main_data_t *data, hashtable_t *env, char *input); // Error: KO
 int do_input(main_data_t *data); // Error: KO
 
 /* terminal */ // Error: KO
+void enable_raw_mode(main_data_t *data); // Error: None
 int display_pty(main_data_t *data); // Error: KO
 int pty_input_char(terminal_buffer_t *terminal, char **str, char c);
 int pty_exec_handling(main_data_t *data, pid_t pid); // Error: KO
