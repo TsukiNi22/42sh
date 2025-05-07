@@ -16,7 +16,7 @@
 #include <errno.h>
 #include <stdio.h>
 
-static int input_cmd(char **str, int pos, char **input)
+static int input_cmd(char **str, char **input)
 {
     if (!str)
         return EXIT_FAILURE;
@@ -65,7 +65,7 @@ static size_t characters_handling(main_data_t *data, char **str, int *pos,
     if (!str)
         return EXIT_FAILURE;
     if (c == '\n')
-        return input_cmd(str, *pos, &(data->input));
+        return input_cmd(str, &(data->input));
     if (c == 127 || c == '\b')
         backspace(str, pos);
     if (c == '\t')
