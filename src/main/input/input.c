@@ -47,6 +47,7 @@ static size_t cc_handler(main_data_t *data, int *pos, char **str)
         return EXIT_FAILURE;
     sigint(true, false);
     *pos = 0;
+    data->nb_press = 0;
     memset(*str, 0, sizeof(char) * (MAX_INPUT_STR + 1));
     print_prompt(data, NULL);
     return EXIT_SUCCESS;
