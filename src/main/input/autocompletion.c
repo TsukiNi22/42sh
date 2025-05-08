@@ -108,21 +108,21 @@ static size_t get_index(char *str)
     return i;
 }
 
-static size_t get_space(char *str)
+static bool get_space(char *str)
 {
     size_t i = 0;
-    size_t space = 0;
 
-    for (; str[i] != ' ' && str[i] != '\0'; i++);
-    if (i == 0)
-        return space;
-    for (; str[i] == ' '; i++)
-        space++;
-    return space;
+    for (; str[i] == ' ' && str[i]; i++);
+    if (!str[i])
+        return false;
+    for (; str[i] != ' ' && str[i]; i++);
+    if (str[i] == ' ')
+        return true;
+    return false;
 }
 
 static char **init_cmds(main_data_t *data, char **prefix, size_t *index,
-    size_t space)
+    bool space)
 {
     char **cmds = NULL;
 
@@ -132,18 +132,18 @@ static char **init_cmds(main_data_t *data, char **prefix, size_t *index,
         cmds = list_files();
     if (!cmds)
         return NULL;
-    *index = get_index(prefix[0]);
+    *index = get_index(*prefix);
     printf("\n");
     return cmds;
 }
 
 static size_t print_cmds(char **cmds, char **prefix, size_t index)
 {
-    size_t len = strlen(&prefix[0][index]);
+    size_t len = strlen(&(*prefix)[index]);
     size_t found = 0;
 
     for (size_t i = 0; cmds[i]; i++) {
-        if (strncmp(cmds[i], &prefix[0][index], len) == 0) {
+        if (strncmp(cmds[i], &(*prefix)[index], len) == 0) {
             printf("%s  ", cmds[i]);
             found = 1;
         }
@@ -154,22 +154,22 @@ static size_t print_cmds(char **cmds, char **prefix, size_t index)
 void suggest(char **prefix, int pos, main_data_t *data)
 {
     size_t index = 0;
-    size_t space = 0;
     char **cmds = NULL;
+    bool space = 0;
 
-    prefix[0][pos] = '\0';
-    space = get_space(prefix[0]);
+    (*prefix)[pos] = '\0';
+    space = get_space(*prefix);
     cmds = init_cmds(data, prefix, &index, space);
     if (!cmds)
         return;
     if (!print_cmds(cmds, prefix, index)) {
         if (!space)
-            printf("No command matching : %s", &prefix[0][index]);
+            printf("No command matching : %s", &(*prefix)[index]);
         else
-            printf("No file or directory matching : %s", &prefix[0][index]);
+            printf("No file or directory matching : %s", &(*prefix)[index]);
     }
     if (cmds)
         free(cmds);
     fflush(stdout);
-    print_prompt(data, prefix[0]);
+    print_prompt(data, *prefix);
 }
