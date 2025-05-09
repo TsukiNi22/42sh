@@ -43,6 +43,7 @@ char const *help_ligne[] = {
     "\t-unset [var_name]+\n",
     "\t-clear\n",
     "\t-which [command | alias | builtin]+\n",
+    "\t-where [command | alias | builtin]+\n",
     "\t-![! | number | string]\n",
     "\t-.SILENT [true | false]\n",
     NULL

@@ -61,7 +61,8 @@ PARSER := 	main/parser/inputs_parser.c \
 			main/parser/input_parser.c \
 			main/parser/cmd_parser.c \
 			main/parser/replace_var.c \
-			main/parser/replace_alias.c
+			main/parser/replace_alias.c \
+			main/parser/replace_globin.c
 
 INPUT := 	main/input/input.c \
 			main/input/arrows.c \

@@ -66,22 +66,23 @@ The terminal also start on it's own if the 42sh is launched not from a terminal
 [![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=700&size=22&pause=1000&color=F7077E&vCenter=true&width=435&height=30&lines=Handeling)](https://git.io/typing-svg)
 ---
 
-| Handle                                   | Utility |
-| ---------------------------------------- | ------- |
-| Binary & Builtin (see under) execution   | Can execute binary and builtin defined under |
-| Nice Prompt 😎                           | Prompt ascpect:`$[return_value] exec_path➤`, if you are in a github repo `$[return_value] exec_path: branch_name➤`|
+| Handle                                   | Utility                                                                                                                                                               |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Binary & Builtin (see under) execution   | Can execute binary and builtin defined under                                                                                                                          |
+| Nice Prompt 😎                           | Prompt ascpect:`$[return_value] exec_path➤`, if you are in a github repo `$[return_value] exec_path: branch_name➤`                                                    |
 | Logic `&&` and `\|\|`                    | For `first && second` only execute the second part if the first have return `0`, for `first \|\| second` only execute the second part if the first haven't return `0` |
-| Line separator `;`                       | Can separate command on the same input `command_1; commande_2` |
-| Redirection (`<`, `<<`, `>`, `>>`, `\|`) | Handle the listed redirection `<`, `<<`, `>`, `>>` and `\|`. Each of them can be combined in some order |
-| Quotes `""` and `''`                     | `""` as the same use as `''`, can only be used to make one paramater with space and other thing like `"a single input"` same as `'a single input'` |
-| Variable replacement `$VAR`              | Replace var in the user input like `echo $TERM` where `TERM='xterm-256color'` become in the execution `echo xterm-256color` |
-| Alias                                    | Handle alias setup and alias replace in the user input |
-| History `~/.banana_history`              | Store the past command used with a default limits of 50.000 or with the limits stoked in `$HISTSIZE` |
-| Rc `~/.bananarc`                         | Execute each line stoked in the `~/.bananarc` as a input, also handle comment on single line with `#` |
-| Source                                   | Execute each line of the given file as a input, if no file given execute the `~/.bananarc` |
-| Autocompletion                           | When tab (`\t`) is pressed propose possible command or file (depend on the situation) who complete the actual word |
-| Line edition 🡰 🡲 🡱 🡳                   | Handle arrow to change cursor position or go back in time with the past command stored in history |
-| Terminal (B.a.S.H) 😎                    | Using the `-t` option or launch the shell in a non terminal place, that will start a minimal (`$TERM='minimal'`) terminal made in CSFML |
+| Line separator `;`                       | Can separate command on the same input `command_1; commande_2`                                                                                                        |
+| Redirection (`<`, `<<`, `>`, `>>`, `\|`) | Handle the listed redirection `<`, `<<`, `>`, `>>` and `\|`. Each of them can be combined in some order                                                               |
+| Quotes `""` and `''`                     | `""` as the same use as `''`, can only be used to make one paramater with space and other thing like `"a single input"` same as `'a single input'`                    |
+| Variable replacement `$VAR`              | Replace var in the user input like `echo $TERM` where `TERM='xterm-256color'` become in the execution `echo xterm-256color`                                           |
+| Alias                                    | Handle alias setup and alias replace in the user input                                                                                                                |
+| History `~/.banana_history`              | Store the past command used with a default limits of 50.000 or with the limits stoked in `$HISTSIZE`                                                                  |
+| Rc `~/.bananarc`                         | Execute each line stoked in the `~/.bananarc` as a input, also handle comment on single line with `#`                                                                 |
+| Source                                   | Execute each line of the given file as a input, if no file given execute the `~/.bananarc`                                                                            |
+| Globing                                  | Auto complete in the input the regex [a-z], *, ?, ...                                                                                                                 |
+| Autocompletion                           | When tab (`\t`) is pressed propose possible command or file (depend on the situation) who complete the actual word                                                    |
+| Line edition 🡰 🡲 🡱 🡳                     | Handle arrow to change cursor position or go back in time with the past command stored in history                                                                     |
+| Terminal (B.a.S.H) 😎                    | Using the `-t` option or launch the shell in a non terminal place, that will start a minimal (`$TERM='minimal'`) terminal made in CSFML                               |
 
 [![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=700&size=22&pause=1000&color=F7077E&vCenter=true&width=435&height=30&lines=🎈Usage)](https://git.io/typing-svg)
 ---
