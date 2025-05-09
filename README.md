@@ -59,6 +59,12 @@ help
 ```
 The terminal also start on it's own if the 42sh is launched not from a terminal
 
+<strong>If the font is missing</strong> `Failed to load font "/usr/share/fonts/liberation-mono/LiberationMono-Regular.ttf" (failed to create the font face)` <strong>do this rule of the Makefile to setup the font</strong>
+
+```bash
+make set_font
+```
+
 [![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=700&size=22&pause=1000&color=F7077E&vCenter=true&width=435&height=30&lines=Prerequisite)](https://git.io/typing-svg)
 ---
 
