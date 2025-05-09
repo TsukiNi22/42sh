@@ -157,6 +157,11 @@ tests_run:    unit_tests
 	./$(TEST_TARGET)
 	gcovr . --exclude tests/ --exclude lib/
 
+set_font:
+	@echo "Setup the font in \'/usr/share/fonts/liberation-mono/\'..."
+	@sudo cp font/LiberationMono-Regular.ttf \
+	/usr/share/fonts/liberation-mono/LiberationMono-Regular.ttf
+
 sys_cmd: $(TARGET)
 	@echo "Copying the target in \'/usr/local/bin\'..."
 	@sudo cp $(TARGET) /usr/local/bin/$(TARGET)
